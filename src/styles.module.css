@@ -1,0 +1,129 @@
+.copyPageContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.copyPageButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ifm-navbar-background-color, #fff);
+  border: 1px solid var(--ifm-color-emphasis-300, #ddd);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ifm-navbar-link-color, #333);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.copyPageButton:hover {
+  background: var(--ifm-color-emphasis-100, #f5f5f5);
+  border-color: var(--ifm-color-emphasis-400, #bbb);
+}
+
+.copyPageButton:focus {
+  background: var(--ifm-color-emphasis-200, #eee);
+  border-color: var(--ifm-color-primary, #007acc);
+  outline: none;
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+.copyPageDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 99999;
+  min-width: 320px;
+  margin-top: 8px;
+  background: var(--ifm-background-color, #fff);
+  border: 1px solid var(--ifm-color-emphasis-300, #ddd);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  background: transparent;
+  color: var(--ifm-color-content, #333);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200, #f0f0f0);
+}
+
+.dropdownItem:last-child {
+  border-bottom: none;
+}
+
+.dropdownItem:hover {
+  background: var(--ifm-color-emphasis-100, #f5f5f5);
+}
+
+.dropdownItem svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--ifm-color-emphasis-600, #666);
+}
+
+.itemTitle {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  color: var(--ifm-color-content, #333);
+}
+
+.itemDescription {
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--ifm-color-content-secondary, #666);
+}
+
+/* Dark theme support */
+[data-theme='dark'] .copyPageDropdown {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .copyPageButton {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  
+  .copyPageDropdown {
+    min-width: 280px;
+  }
+  
+  .dropdownItem {
+    padding: 14px;
+  }
+} 
