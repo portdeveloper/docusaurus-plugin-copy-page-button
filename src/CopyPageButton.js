@@ -73,6 +73,9 @@ export default function CopyPageButton() {
           ".codeBlockTitle",
           ".theme-code-block-title",
           ".buttonGroup",
+          ".code-block-error-line",
+          ".line-number",
+          ".highlight-source-copy",
         ];
         selectorsToRemove.forEach((selector) => {
           clone.querySelectorAll(selector).forEach((el) => el.remove());
@@ -107,7 +110,9 @@ export default function CopyPageButton() {
         .replace(/\u00A0/g, " ") // Replace non-breaking spaces
         .replace(/[\u2018\u2019]/g, "'") // Smart quotes
         .replace(/[\u201C\u201D]/g, '"')
-        .replace(/â€‹/g, ""); // Clean encoding issues
+        .replace(/â€‹/g, "") // Clean encoding issues
+        .replace(/\s+/g, " ") // Normalize whitespace
+        .trim();
     };
 
     const processNode = (node) => {
@@ -162,59 +167,93 @@ export default function CopyPageButton() {
             if (node.parentElement?.tagName.toLowerCase() === "pre") {
               return children;
             }
-            return `\`${children}\``;
+            // Clean inline code content
+            const cleanInlineCode = children
+              .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width spaces
+              .replace(/\u00A0/g, " ") // Replace non-breaking spaces
+              .trim();
+            return `\`${cleanInlineCode}\``;
           case "pre":
             // Handle Docusaurus code blocks properly
             const codeElement = node.querySelector("code");
             if (codeElement) {
               // Try to get language from various possible class patterns
               const language =
-                (codeElement.className.match(/language-(\w+)/) ||
-                  node.className.match(/language-(\w+)/) ||
+                (codeElement.className?.match(/language-(\w+)/) ||
+                  node.className?.match(/language-(\w+)/) ||
+                  codeElement.className?.match(/hljs-(\w+)/) ||
+                  codeElement.className?.match(/prism-(\w+)/) ||
                   [])[1] || "";
 
               let codeContent = "";
 
-              // Try the most direct approach: look for individual code lines
-              const codeLines = codeElement.querySelectorAll("div");
-              if (codeLines.length > 0) {
-                // Extract content from each div that looks like a code line
-                codeContent = Array.from(codeLines)
-                  .map((lineDiv) => {
-                    // Skip if this looks like a line number container
-                    if (
-                      lineDiv.className.includes("codeLineNumber") ||
-                      lineDiv.className.includes("LineNumber")
-                    ) {
-                      return null; // Use null to indicate skip
-                    }
-                    const lineText = lineDiv.textContent || "";
-                    return lineText;
-                  })
-                  .filter((line) => line !== null) // Only filter out skipped lines, not empty lines
-                  .join("\n");
-              } else {
-                // Fallback: get all text but try to clean it
-                const fullText = codeElement.textContent || "";
-
-                // Try to extract just the code part by looking for common code patterns
-                // Look for import statements, function declarations, etc.
-                const codeMatch = fullText.match(
-                  /(import\s|const\s|function\s|class\s|\/\*|\/\/|npx\s|Successfully\s|[a-zA-Z_$][a-zA-Z0-9_$]*\s*[=:\(])/
-                );
-                if (codeMatch) {
-                  const codeStart = codeMatch.index;
-                  codeContent = fullText.substring(codeStart);
+              try {
+                // Method 1: Try to get content from data attributes (some themes store original content)
+                const originalContent = codeElement.getAttribute('data-code') || 
+                                      node.getAttribute('data-code') ||
+                                      codeElement.getAttribute('data-raw');
+                
+                if (originalContent) {
+                  codeContent = originalContent;
                 } else {
-                  // Last resort: try to remove leading numbers
-                  codeContent = fullText.replace(/^\d+/, "");
+                  // Method 2: Look for individual code lines in specific containers
+                  const codeLines = codeElement.querySelectorAll("span[data-line], .token-line, .code-line, .highlight-line");
+                  if (codeLines.length > 0) {
+                    codeContent = Array.from(codeLines)
+                      .map((lineElement) => {
+                        return lineElement?.textContent || "";
+                      })
+                      .join("\n");
+                  } else {
+                    // Method 3: Look for div-based line structure
+                    const codeLineDivs = codeElement.querySelectorAll("div");
+                    if (codeLineDivs.length > 0) {
+                      codeContent = Array.from(codeLineDivs)
+                        .map((lineDiv) => {
+                          // Skip if this looks like a line number container
+                          if (
+                            lineDiv.className?.includes("codeLineNumber") ||
+                            lineDiv.className?.includes("LineNumber") ||
+                            lineDiv.className?.includes("line-number") ||
+                            lineDiv.style?.userSelect === 'none'
+                          ) {
+                            return null;
+                          }
+                          return lineDiv?.textContent || "";
+                        })
+                        .filter((line) => line !== null)
+                        .join("\n");
+                    } else {
+                      // Method 4: Direct text extraction with cleanup
+                      let rawText = codeElement.textContent || "";
+                      
+                      // Remove line numbers at the start of lines (common pattern: "1 ", "12 ", etc.)
+                      rawText = rawText.replace(/^\d+\s+/gm, "");
+                      
+                      // Remove copy button text and other UI elements
+                      rawText = rawText.replace(/^Copy$/gm, "");
+                      rawText = rawText.replace(/^Copied!$/gm, "");
+                      rawText = rawText.replace(/^\s*Copy to clipboard\s*$/gm, "");
+                      
+                      codeContent = rawText;
+                    }
+                  }
                 }
-              }
 
-              // Final cleanup
-              codeContent = codeContent
-                .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width spaces
-                .trim();
+                // Final cleanup
+                codeContent = codeContent
+                  .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width spaces
+                  .replace(/\u00A0/g, " ") // Replace non-breaking spaces
+                  .trim();
+
+                // Remove empty lines at start and end
+                codeContent = codeContent.replace(/^\n+|\n+$/g, "");
+
+              } catch (error) {
+                // Fallback to simple text extraction if anything fails
+                console.warn("Code extraction failed, using fallback:", error);
+                codeContent = codeElement.textContent || "";
+              }
 
               return `\n\`\`\`${language}\n${codeContent}\n\`\`\`\n\n`;
             }
@@ -337,7 +376,7 @@ Please provide a clear summary and help me understand the key concepts covered i
           strokeWidth="2"
         >
           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"></path>
         </svg>
       ),
       action: () => copyToClipboard(pageContent),
