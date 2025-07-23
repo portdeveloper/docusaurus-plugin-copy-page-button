@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import styles from './styles.module.css';
+import React, { useState, useEffect, useRef } from "react";
+import styles from "./styles.module.css";
 
 export default function CopyPageButton() {
   const [isOpen, setIsOpen] = useState(false);
-  const [pageContent, setPageContent] = useState('');
-  const [pageTitle, setPageTitle] = useState('');
-  const [currentUrl, setCurrentUrl] = useState('');
+  const [pageContent, setPageContent] = useState("");
+  const [pageTitle, setPageTitle] = useState("");
+  const [currentUrl, setCurrentUrl] = useState("");
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -16,44 +16,16 @@ export default function CopyPageButton() {
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
+  // Track URL changes
   useEffect(() => {
-    const extractPageContent = () => {
-      const mainContent = document.querySelector('main article') || document.querySelector('main .markdown');
-      const titleElement = document.querySelector('h1') || document.querySelector('.theme-doc-markdown h1') || document.querySelector('article h1');
-      
-      if (titleElement) {
-        setPageTitle(titleElement.textContent.trim());
-      }
-      
-      if (mainContent) {
-        const clone = mainContent.cloneNode(true);
-        clone.querySelectorAll('.theme-edit-this-page, .theme-last-updated, .pagination-nav, .theme-doc-breadcrumbs, .theme-doc-footer, button, .copy-code-button').forEach(el => el.remove());
-        let content = convertHtmlToMarkdown(clone);
-        
-        const url = window.location.href;
-        content = `# ${pageTitle || 'Documentation Page'}\n\nURL: ${url}\n\n${content}`;
-        
-        setPageContent(content);
-      }
-    };
-
-    // Extract immediately
-    extractPageContent();
-    // Also extract after a delay in case content loads later
-    const timer = setTimeout(extractPageContent, 100);
-    return () => clearTimeout(timer);
-  }, [currentUrl, pageTitle]);
-
-  useEffect(() => {
-    // Track URL changes
     const updateUrl = () => setCurrentUrl(window.location.href);
     updateUrl(); // Set initial URL
     
@@ -61,133 +33,376 @@ export default function CopyPageButton() {
     const observer = new MutationObserver(updateUrl);
     observer.observe(document, { subtree: true, childList: true });
     
-    return () => observer.disconnect();
+    // Also listen for popstate events
+    window.addEventListener('popstate', updateUrl);
+    
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('popstate', updateUrl);
+    };
   }, []);
 
-  const convertHtmlToMarkdown = (element) => {
+  useEffect(() => {
+    const extractPageContent = () => {
+      const mainContent =
+        document.querySelector("main article") ||
+        document.querySelector("main .markdown");
+      const titleElement =
+        document.querySelector("h1") ||
+        document.querySelector(".theme-doc-markdown h1") ||
+        document.querySelector("article h1");
+
+      if (titleElement) {
+        setPageTitle(titleElement.textContent.trim());
+      }
+
+      if (mainContent) {
+        const clone = mainContent.cloneNode(true);
+
+        const selectorsToRemove = [
+          ".theme-edit-this-page",
+          ".theme-last-updated",
+          ".pagination-nav",
+          ".theme-doc-breadcrumbs",
+          ".theme-doc-footer",
+          "button",
+          ".copy-code-button",
+          ".theme-code-block-highlighted-line",
+          ".buttonGroup__atx",
+          ".clean-btn",
+          ".codeBlockTitle",
+          ".theme-code-block-title",
+          ".buttonGroup",
+        ];
+        selectorsToRemove.forEach((selector) => {
+          clone.querySelectorAll(selector).forEach((el) => el.remove());
+        });
+
+        const firstH1 = clone.querySelector("h1");
+        if (
+          firstH1 &&
+          pageTitle &&
+          firstH1.textContent.trim() === pageTitle.trim()
+        ) {
+          firstH1.remove();
+        }
+
+        const content = convertToMarkdown(clone);
+        setPageContent(
+          `# ${
+            pageTitle || "Documentation Page"
+          }\n\nURL: ${currentUrl}\n\n${content}`
+        );
+      }
+    };
+
+    const timer = setTimeout(extractPageContent, 300);
+    return () => clearTimeout(timer);
+  }, [currentUrl, pageTitle]);
+
+  const convertToMarkdown = (element) => {
+    const cleanText = (text) => {
+      return text
+        .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width spaces
+        .replace(/\u00A0/g, " ") // Replace non-breaking spaces
+        .replace(/[\u2018\u2019]/g, "'") // Smart quotes
+        .replace(/[\u201C\u201D]/g, '"')
+        .replace(/â€‹/g, ""); // Clean encoding issues
+    };
+
     const processNode = (node) => {
       if (node.nodeType === Node.TEXT_NODE) {
-        return node.textContent;
+        return cleanText(node.textContent);
       }
-      
+
       if (node.nodeType === Node.ELEMENT_NODE) {
-        const tagName = node.tagName.toLowerCase();
-        const children = Array.from(node.childNodes).map(child => processNode(child)).join('');
+        const tag = node.tagName.toLowerCase();
+        const childResults = Array.from(node.childNodes).map((child) => processNode(child));
         
-        switch (tagName) {
-          case 'h1':
+        // Join child results with intelligent spacing
+        let children = "";
+        for (let i = 0; i < childResults.length; i++) {
+          const current = childResults[i];
+          const previous = i > 0 ? childResults[i - 1] : "";
+          
+          if (current) {
+            if (previous && 
+                !previous.match(/[\s\n]$/) && 
+                !current.match(/^[\s\n]/) &&
+                previous.trim() && 
+                current.trim()) {
+              children += " ";
+            }
+            children += current;
+          }
+        }
+
+        switch (tag) {
+          case "h1":
             return `\n# ${children.trim()}\n\n`;
-          case 'h2':
+          case "h2":
             return `\n## ${children.trim()}\n\n`;
-          case 'h3':
+          case "h3":
             return `\n### ${children.trim()}\n\n`;
-          case 'h4':
+          case "h4":
             return `\n#### ${children.trim()}\n\n`;
-          case 'h5':
+          case "h5":
             return `\n##### ${children.trim()}\n\n`;
-          case 'h6':
+          case "h6":
             return `\n###### ${children.trim()}\n\n`;
-          case 'p':
-            return children.trim() ? `${children.trim()}\n\n` : '\n';
-          case 'strong':
-          case 'b':
+          case "p":
+            return children.trim() ? `${children.trim()}\n\n` : "\n";
+          case "strong":
+          case "b":
             return `**${children}**`;
-          case 'em':
-          case 'i':
+          case "em":
+          case "i":
             return `*${children}*`;
-          case 'code':
-            if (node.parentElement && node.parentElement.tagName.toLowerCase() === 'pre') {
+          case "code":
+            if (node.parentElement?.tagName.toLowerCase() === "pre") {
               return children;
             }
             return `\`${children}\``;
-          case 'pre':
-            const codeElement = node.querySelector('code');
-            const language = codeElement && codeElement.className ? 
-              codeElement.className.replace(/language-|hljs|lang-/g, '').split(' ')[0] : '';
-            return `\n\`\`\`${language}\n${children.trim()}\n\`\`\`\n\n`;
-          case 'ul':
+          case "pre":
+            // Handle Docusaurus code blocks properly
+            const codeElement = node.querySelector("code");
+            if (codeElement) {
+              // Try to get language from various possible class patterns
+              const language =
+                (codeElement.className.match(/language-(\w+)/) ||
+                  node.className.match(/language-(\w+)/) ||
+                  [])[1] || "";
+
+              let codeContent = "";
+
+              // Try the most direct approach: look for individual code lines
+              const codeLines = codeElement.querySelectorAll("div");
+              if (codeLines.length > 0) {
+                // Extract content from each div that looks like a code line
+                codeContent = Array.from(codeLines)
+                  .map((lineDiv) => {
+                    // Skip if this looks like a line number container
+                    if (
+                      lineDiv.className.includes("codeLineNumber") ||
+                      lineDiv.className.includes("LineNumber")
+                    ) {
+                      return null; // Use null to indicate skip
+                    }
+                    const lineText = lineDiv.textContent || "";
+                    return lineText;
+                  })
+                  .filter((line) => line !== null) // Only filter out skipped lines, not empty lines
+                  .join("\n");
+              } else {
+                // Fallback: get all text but try to clean it
+                const fullText = codeElement.textContent || "";
+
+                // Try to extract just the code part by looking for common code patterns
+                // Look for import statements, function declarations, etc.
+                const codeMatch = fullText.match(
+                  /(import\s|const\s|function\s|class\s|\/\*|\/\/|npx\s|Successfully\s|[a-zA-Z_$][a-zA-Z0-9_$]*\s*[=:\(])/
+                );
+                if (codeMatch) {
+                  const codeStart = codeMatch.index;
+                  codeContent = fullText.substring(codeStart);
+                } else {
+                  // Last resort: try to remove leading numbers
+                  codeContent = fullText.replace(/^\d+/, "");
+                }
+              }
+
+              // Final cleanup
+              codeContent = codeContent
+                .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width spaces
+                .trim();
+
+              return `\n\`\`\`${language}\n${codeContent}\n\`\`\`\n\n`;
+            }
+            return `\n\`\`\`\n${children}\n\`\`\`\n\n`;
+          case "ul":
             return `\n${children}`;
-          case 'ol':
-            let olChildren = Array.from(node.childNodes)
-              .filter(child => child.nodeType === Node.ELEMENT_NODE && child.tagName.toLowerCase() === 'li')
-              .map((child, index) => `${index + 1}. ${processNode(child).replace(/^- /, '')}`);
-            return `\n${olChildren.join('')}`;
-          case 'li':
+          case "ol":
+            const items = Array.from(node.querySelectorAll("li"));
+            return (
+              "\n" +
+              items
+                .map(
+                  (item, index) =>
+                    `${index + 1}. ${processNode(item)
+                      .replace(/^- /, "")
+                      .trim()}\n`
+                )
+                .join("")
+            );
+          case "li":
             return `- ${children.trim()}\n`;
-          case 'a':
-            const href = node.getAttribute('href');
-            if (href && !href.startsWith('#') && children.trim()) {
+          case "a":
+            const href = node.getAttribute("href");
+            if (href && !href.startsWith("#") && children.trim()) {
               return `[${children.trim()}](${href})`;
             }
             return children;
-          case 'br':
-            return '\n';
-          case 'div':
-          case 'section':
-          case 'article':
-            return children + '\n';
-          case 'blockquote':
+          case "br":
+            return "\n";
+          case "blockquote":
             return `\n> ${children.trim()}\n\n`;
-          case 'table':
+          case "table":
             return `\n${children}\n`;
-          case 'thead':
-          case 'tbody':
-            return children;
-          case 'tr':
+          case "tr":
             return `${children}\n`;
-          case 'th':
-          case 'td':
+          case "th":
+          case "td":
             return `| ${children.trim()} `;
-          case 'img':
-            const src = node.getAttribute('src');
-            const alt = node.getAttribute('alt') || '';
-            return src ? `![${alt}](${src})` : '';
+          case "img":
+            const src = node.getAttribute("src");
+            const alt = node.getAttribute("alt") || "";
+            return src ? `![${alt}](${src})` : "";
+          case "div":
+          case "section":
+          case "article":
+            // Handle admonitions
+            if (node.classList?.contains("admonition")) {
+              const type =
+                Array.from(node.classList)
+                  .find((cls) => cls.startsWith("alert--"))
+                  ?.replace("alert--", "") || "note";
+              return `\n> **${type.toUpperCase()}**: ${children.trim()}\n\n`;
+            }
+            return children + "\n";
           default:
             return children;
         }
       }
-      
-      return '';
+
+      return "";
     };
-    
+
     return processNode(element)
-      .replace(/\n{3,}/g, '\n\n') // Replace multiple newlines with double newlines
-      .replace(/^\n+|\n+$/g, '') // Trim leading/trailing newlines
+      .replace(/\n{3,}/g, "\n\n") // Limit multiple newlines
+      .replace(/^\n+|\n+$/g, "") // Trim newlines
       .trim();
   };
 
   const copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      // Could add a toast notification here
-      console.log('Content copied to clipboard');
+      console.log("Content copied to clipboard");
     } catch (err) {
-      console.error('Failed to copy content:', err);
       // Fallback for older browsers
-      const textArea = document.createElement('textarea');
+      const textArea = document.createElement("textarea");
       textArea.value = text;
       document.body.appendChild(textArea);
       textArea.select();
-      document.execCommand('copy');
+      document.execCommand("copy");
       document.body.removeChild(textArea);
     }
   };
 
   const openInChatGPT = () => {
-    const prompt = encodeURIComponent(`Please analyze this documentation page:\n\n${pageContent}`);
-    window.open(`https://chat.openai.com/?q=${prompt}`, '_blank');
+    const prompt = encodeURIComponent(
+      `Please read and explain this documentation page: ${currentUrl}
+
+Please provide a clear summary and help me understand the key concepts covered in this documentation.`
+    );
+    window.open(`https://chat.openai.com/?q=${prompt}`, "_blank");
   };
 
   const openInClaude = () => {
-    const prompt = encodeURIComponent(`Please analyze this documentation page:\n\n${pageContent}`);
-    window.open(`https://claude.ai/new?q=${prompt}`, '_blank');
+    const prompt = encodeURIComponent(
+      `Please read and explain this documentation page: ${currentUrl}
+
+Please provide a clear summary and help me understand the key concepts covered in this documentation.`
+    );
+    window.open(`https://claude.ai/new?q=${prompt}`, "_blank");
   };
 
   const viewAsMarkdown = () => {
-    const blob = new Blob([pageContent], { type: 'text/plain' });
+    const blob = new Blob([pageContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
+
+  const dropdownItems = [
+    {
+      id: "copy",
+      title: "Copy page",
+      description: "Copy the page as MarkDown for LLMs",
+      icon: (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      ),
+      action: () => copyToClipboard(pageContent),
+    },
+    {
+      id: "view",
+      title: "View as MarkDown",
+      description: "View this page as plain text",
+      icon: (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14,2 14,8 20,8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+      ),
+      action: viewAsMarkdown,
+    },
+    {
+      id: "chatgpt",
+      title: "Open in ChatGPT",
+      description: "Ask questions about this page",
+      icon: (
+        <svg
+          width="16"
+          height="16"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+          strokeWidth="1.5"
+          viewBox="-0.17090198558635983 0.482230148717937 41.14235318283891 40.0339509076386"
+        >
+          <path
+            d="M37.532 16.87a9.963 9.963 0 0 0-.856-8.184 10.078 10.078 0 0 0-10.855-4.835A9.964 9.964 0 0 0 18.306.5a10.079 10.079 0 0 0-9.614 6.977 9.967 9.967 0 0 0-6.664 4.834 10.08 10.08 0 0 0 1.24 11.817 9.965 9.965 0 0 0 .856 8.185 10.079 10.079 0 0 0 10.855 4.835 9.965 9.965 0 0 0 7.516 3.35 10.078 10.078 0 0 0 9.617-6.981 9.967 9.967 0 0 0 6.663-4.834 10.079 10.079 0 0 0-1.243-11.813zM22.498 37.886a7.474 7.474 0 0 1-4.799-1.735c.061-.033.168-.091.237-.134l7.964-4.6a1.294 1.294 0 0 0 .655-1.134V19.054l3.366 1.944a.12.12 0 0 1 .066.092v9.299a7.505 7.505 0 0 1-7.49 7.496zM6.392 31.006a7.471 7.471 0 0 1-.894-5.023c.06.036.162.099.237.141l7.964 4.6a1.297 1.297 0 0 0 1.308 0l9.724-5.614v3.888a.12.12 0 0 1-.048.103l-8.051 4.649a7.504 7.504 0 0 1-10.24-2.744zM4.297 13.62A7.469 7.469 0 0 1 8.2 10.333c0 .068-.004.19-.004.274v9.201a1.294 1.294 0 0 0 .654 1.132l9.723 5.614-3.366 1.944a.12.12 0 0 1-.114.01L7.04 23.856a7.504 7.504 0 0 1-2.743-10.237zm27.658 6.437l-9.724-5.615 3.367-1.943a.121.121 0 0 1 .113-.01l8.052 4.648a7.498 7.498 0 0 1-1.158 13.528v-9.476a1.293 1.293 0 0 0-.65-1.132zm3.35-5.043c-.059-.037-.162-.099-.236-.141l-7.965-4.6a1.298 1.298 0 0 0-1.308 0l-9.723 5.614v-3.888a.12.12 0 0 1 .048-.103l8.05-4.645a7.497 7.497 0 0 1 11.135 7.763zm-21.063 6.929l-3.367-1.944a.12.12 0 0 1-.065-.092v-9.299a7.497 7.497 0 0 1 12.293-5.756 6.94 6.94 0 0 0-.236.134l-7.965 4.6a1.294 1.294 0 0 0-.654 1.132l-.006 11.225zm1.829-3.943l4.33-2.501 4.332 2.5v5l-4.331 2.5-4.331-2.5V18z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+      action: openInChatGPT,
+    },
+    {
+      id: "claude",
+      title: "Open in Claude",
+      description: "Ask questions about this page",
+      icon: (
+        <svg
+          width="16"
+          height="16"
+          fill="currentColor"
+          fillRule="evenodd"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z" />
+        </svg>
+      ),
+      action: openInClaude,
+    },
+  ];
 
   return (
     <div className={styles.copyPageContainer} ref={dropdownRef}>
@@ -204,11 +419,9 @@ export default function CopyPageButton() {
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
         >
           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"></path>
         </svg>
         Copy page
         <svg
@@ -218,9 +431,9 @@ export default function CopyPageButton() {
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={isOpen ? `${styles.chevron} ${styles.open}` : styles.chevron}
+          className={
+            isOpen ? `${styles.chevron} ${styles.open}` : styles.chevron
+          }
         >
           <polyline points="6,9 12,15 18,9"></polyline>
         </svg>
@@ -228,117 +441,24 @@ export default function CopyPageButton() {
 
       {isOpen && (
         <div className={styles.copyPageDropdown}>
-          <button
-            className={styles.dropdownItem}
-            onClick={() => {
-              copyToClipboard(pageContent);
-              setIsOpen(false);
-            }}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          {dropdownItems.map((item) => (
+            <button
+              key={item.id}
+              className={styles.dropdownItem}
+              onClick={() => {
+                item.action();
+                setIsOpen(false);
+              }}
             >
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            <div>
-              <div className={styles.itemTitle}>Copy page</div>
-              <div className={styles.itemDescription}>Copy the page as Markdown for LLMs</div>
-            </div>
-          </button>
-
-          <button
-            className={styles.dropdownItem}
-            onClick={() => {
-              viewAsMarkdown();
-              setIsOpen(false);
-            }}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14,2 14,8 20,8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10,9 9,9 8,9"></polyline>
-            </svg>
-            <div>
-              <div className={styles.itemTitle}>View as Markdown</div>
-              <div className={styles.itemDescription}>View this page as plain text</div>
-            </div>
-          </button>
-
-          <button
-            className={styles.dropdownItem}
-            onClick={() => {
-              openInChatGPT();
-              setIsOpen(false);
-            }}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-              <line x1="9" y1="9" x2="9.01" y2="9"></line>
-              <line x1="15" y1="9" x2="15.01" y2="9"></line>
-            </svg>
-            <div>
-              <div className={styles.itemTitle}>Open in ChatGPT</div>
-              <div className={styles.itemDescription}>Ask questions about this page</div>
-            </div>
-          </button>
-
-          <button
-            className={styles.dropdownItem}
-            onClick={() => {
-              openInClaude();
-              setIsOpen(false);
-            }}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
-              <line x1="12" y1="8" x2="12" y2="16"></line>
-              <line x1="8" y1="12" x2="16" y2="12"></line>
-            </svg>
-            <div>
-              <div className={styles.itemTitle}>Open in Claude</div>
-              <div className={styles.itemDescription}>Ask questions about this page</div>
-            </div>
-                      </button>
-          </div>
-        )}
+              {item.icon}
+              <div>
+                <div className={styles.itemTitle}>{item.title}</div>
+                <div className={styles.itemDescription}>{item.description}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 } 
