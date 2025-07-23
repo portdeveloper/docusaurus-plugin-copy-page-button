@@ -45,7 +45,10 @@ export default function CopyPageButton() {
       }
     };
 
-    const timer = setTimeout(extractPageContent, 300);
+    // Extract immediately
+    extractPageContent();
+    // Also extract after a delay in case content loads later
+    const timer = setTimeout(extractPageContent, 100);
     return () => clearTimeout(timer);
   }, [currentUrl, pageTitle]);
 
@@ -333,9 +336,9 @@ export default function CopyPageButton() {
               <div className={styles.itemTitle}>Open in Claude</div>
               <div className={styles.itemDescription}>Ask questions about this page</div>
             </div>
-          </button>
-        </div>
-      )}
+                      </button>
+          </div>
+        )}
     </div>
   );
 } 
