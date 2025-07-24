@@ -1,6 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./styles.module.css";
 
+// Move static selectors outside component to avoid recreation
+const SELECTORS_TO_REMOVE = [
+  ".theme-edit-this-page",
+  ".theme-last-updated", 
+  ".pagination-nav",
+  ".theme-doc-breadcrumbs",
+  ".theme-doc-footer",
+  "button",
+  ".copy-code-button",
+  ".theme-code-block-highlighted-line",
+  ".buttonGroup__atx",
+  ".clean-btn",
+  ".codeBlockTitle",
+  ".theme-code-block-title",
+  ".buttonGroup",
+  ".code-block-error-line",
+  ".line-number",
+  ".highlight-source-copy",
+];
+
 export default function CopyPageButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [pageContent, setPageContent] = useState("");
@@ -40,61 +60,31 @@ export default function CopyPageButton() {
       const mainContent =
         document.querySelector("main article") ||
         document.querySelector("main .markdown");
-      const titleElement =
-        document.querySelector("h1") ||
-        document.querySelector(".theme-doc-markdown h1") ||
-        document.querySelector("article h1");
+      
+      if (!mainContent) return;
 
-      if (titleElement) {
-        setPageTitle(titleElement.textContent.trim());
+      const clone = mainContent.cloneNode(true);
+
+      // Remove unwanted elements
+      SELECTORS_TO_REMOVE.forEach((selector) => {
+        clone.querySelectorAll(selector).forEach((el) => el.remove());
+      });
+
+      // Extract title from first H1 and remove it from content
+      const firstH1 = clone.querySelector("h1");
+      const title = firstH1?.textContent.trim() || "Documentation Page";
+      if (firstH1) {
+        firstH1.remove();
+        setPageTitle(title);
       }
 
-      if (mainContent) {
-        const clone = mainContent.cloneNode(true);
-
-        const selectorsToRemove = [
-          ".theme-edit-this-page",
-          ".theme-last-updated",
-          ".pagination-nav",
-          ".theme-doc-breadcrumbs",
-          ".theme-doc-footer",
-          "button",
-          ".copy-code-button",
-          ".theme-code-block-highlighted-line",
-          ".buttonGroup__atx",
-          ".clean-btn",
-          ".codeBlockTitle",
-          ".theme-code-block-title",
-          ".buttonGroup",
-          ".code-block-error-line",
-          ".line-number",
-          ".highlight-source-copy",
-        ];
-        selectorsToRemove.forEach((selector) => {
-          clone.querySelectorAll(selector).forEach((el) => el.remove());
-        });
-
-        const firstH1 = clone.querySelector("h1");
-        if (
-          firstH1 &&
-          pageTitle &&
-          firstH1.textContent.trim() === pageTitle.trim()
-        ) {
-          firstH1.remove();
-        }
-
-        const content = convertToMarkdown(clone);
-        setPageContent(
-          `# ${
-            pageTitle || "Documentation Page"
-          }\n\nURL: ${currentUrl}\n\n${content}`
-        );
-      }
+      const content = convertToMarkdown(clone);
+      setPageContent(`# ${title}\n\nURL: ${currentUrl}\n\n${content}`);
     };
 
     const timer = setTimeout(extractPageContent, 300);
     return () => clearTimeout(timer);
-  }, [currentUrl, pageTitle]);
+  }, [currentUrl]);
 
   const convertToMarkdown = (element) => {
     const cleanText = (text) => {

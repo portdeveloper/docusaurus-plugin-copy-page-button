@@ -1,17 +1,14 @@
 
 
-/* Push down sidebar content to make room for fixed button */
-.table-of-contents,
-.theme-doc-toc-desktop,
-[class*="tableOfContents"],
-.theme-doc-sidebar-container .theme-doc-sidebar,
-.theme-doc-toc-mobile {
-  padding-top: 60px !important;
-}
-
-/* Ensure the button container doesn't interfere with page layout */
+/* Position button container on top of sidebar */
 #copy-page-button-container {
+  position: absolute;
+  top: -60px;
+  left: 0;
+  right: 0;
+  z-index: 9999;
   pointer-events: none;
+  padding-bottom: 20px;
 }
 
 #copy-page-button-container > * {
@@ -28,6 +25,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
+  margin-bottom: 16px;
   background: var(--ifm-navbar-background-color, #1c1e21);
   border: 1px solid var(--ifm-color-emphasis-300);
   border-radius: 6px;
