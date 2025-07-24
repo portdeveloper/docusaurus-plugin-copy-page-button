@@ -28,13 +28,9 @@ export default function CopyPageButton() {
     const updateUrl = () => setCurrentUrl(window.location.href);
     updateUrl(); 
     
-    const observer = new MutationObserver(updateUrl);
-    observer.observe(document, { subtree: true, childList: true });
-    
     window.addEventListener('popstate', updateUrl);
     
     return () => {
-      observer.disconnect();
       window.removeEventListener('popstate', updateUrl);
     };
   }, []);
