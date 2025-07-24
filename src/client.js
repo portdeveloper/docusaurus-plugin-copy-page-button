@@ -2,46 +2,44 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import CopyPageButton from './CopyPageButton';
 
-// Auto-inject the copy page button above the right sidebar on doc pages
+// Auto-inject the copy page button aligned to the sidebar
 if (typeof window !== 'undefined') {
   let root = null;
-  let retryCount = 0;
-  const maxRetries = 30; // Try for up to 1.5 seconds (30 * 50ms)
 
   const injectCopyPageButton = () => {
-    // Find the right sidebar (table of contents)
+    // Check if already injected
+    let container = document.getElementById('copy-page-button-container');
+    if (container) return;
+
+    // Find the sidebar (table of contents)
     const sidebar = document.querySelector('.theme-doc-toc-desktop') || 
                    document.querySelector('.table-of-contents') ||
                    document.querySelector('[class*="tableOfContents"]') ||
                    document.querySelector('[class*="toc"]');
-    
+
     if (!sidebar) {
-      // If sidebar not found and we haven't exceeded retry limit, try again
-      if (retryCount < maxRetries) {
-        retryCount++;
-        // Use shorter intervals for faster response
-        const delay = retryCount < 10 ? 20 : 50; // First 10 attempts very fast, then slower
-        setTimeout(injectCopyPageButton, delay);
-      }
+      // If no sidebar found, retry after a short delay
+      setTimeout(injectCopyPageButton, 100);
       return;
     }
 
-    // Reset retry count on successful sidebar detection
-    retryCount = 0;
-
-    // Check if already injected
-    const existingContainer = document.getElementById('copy-page-button-container');
-    if (existingContainer) return;
-
-    // Create container
-    const container = document.createElement('div');
+    // Create container positioned relative to sidebar
+    container = document.createElement('div');
     container.id = 'copy-page-button-container';
-    container.style.marginBottom = '1rem';
-    container.style.paddingBottom = '1rem';
-    container.style.borderBottom = '1px solid var(--ifm-color-emphasis-200)';
-
-    // Insert before the sidebar
-    sidebar.parentNode.insertBefore(container, sidebar);
+    
+    // Position it fixed relative to the sidebar's current viewport position
+    const sidebarRect = sidebar.getBoundingClientRect();
+    
+    Object.assign(container.style, {
+      position: 'fixed', // Fixed so it doesn't move when scrolling
+      top: sidebarRect.top + 'px', // 60px above sidebar (viewport relative)
+      left: sidebarRect.left + 'px', // 20px to the left of sidebar
+      zIndex: '9999',
+      transition: 'all 0.2s ease'
+    });
+    
+    // Insert into body
+    document.body.appendChild(container);
 
     // Clean up previous root if it exists
     if (root) {
@@ -55,12 +53,32 @@ if (typeof window !== 'undefined') {
     // Render the component
     root = createRoot(container);
     root.render(React.createElement(CopyPageButton));
+
+    // Update position only on resize to maintain sidebar alignment
+    const updatePositionOnResize = () => {
+      if (container && sidebar) {
+        const sidebarRect = sidebar.getBoundingClientRect();
+        container.style.top = (sidebarRect.top - 60) + 'px';
+        container.style.left = (sidebarRect.left - 20) + 'px';
+      }
+    };
+
+    // Only listen for resize (not scroll) to keep alignment on window resize
+    window.addEventListener('resize', updatePositionOnResize);
+    
+    // Store cleanup function
+    container._cleanup = () => {
+      window.removeEventListener('resize', updatePositionOnResize);
+    };
   };
 
   // Clean up function
   const cleanup = () => {
     const container = document.getElementById('copy-page-button-container');
     if (container) {
+      if (container._cleanup) {
+        container._cleanup();
+      }
       if (root) {
         try {
           root.unmount();
@@ -70,27 +88,14 @@ if (typeof window !== 'undefined') {
       }
       container.remove();
     }
-    retryCount = 0;
   };
 
-  // Inject with retry logic
-  const tryInject = () => {
-    retryCount = 0;
+  // Initial injection - immediate since we target body
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectCopyPageButton);
+  } else {
     injectCopyPageButton();
-  };
-
-  // Initial injection - try immediately and on DOM ready
-  const attemptImmediateInjection = () => {
-    // Try immediate injection first
-    tryInject();
-    
-    // If not successful and DOM not ready, wait for DOM ready
-    if (!document.getElementById('copy-page-button-container') && document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', tryInject);
-    }
-  };
-
-  attemptImmediateInjection();
+  }
 
   // Listen for Docusaurus route changes using multiple methods
   let lastUrl = location.href;
@@ -101,8 +106,7 @@ if (typeof window !== 'undefined') {
     if (url !== lastUrl) {
       lastUrl = url;
       cleanup();
-      // Minimal delay to ensure new page content starts rendering
-      setTimeout(tryInject, 25);
+      injectCopyPageButton(); // Instant re-injection
     }
   });
   observer.observe(document, { subtree: true, childList: true });
@@ -110,7 +114,7 @@ if (typeof window !== 'undefined') {
   // Method 2: Listen for popstate events (back/forward navigation)
   window.addEventListener('popstate', () => {
     cleanup();
-    setTimeout(tryInject, 25);
+    injectCopyPageButton();
   });
 
   // Method 3: Listen for custom Docusaurus events if available
@@ -118,20 +122,7 @@ if (typeof window !== 'undefined') {
     // Docusaurus emits route update events
     document.addEventListener('docusaurus-route-update', () => {
       cleanup();
-      setTimeout(tryInject, 25);
+      injectCopyPageButton();
     });
   }
-
-  // Method 4: Periodic check as fallback (only if button is missing)
-  setInterval(() => {
-    if (!document.getElementById('copy-page-button-container')) {
-      // Only try to inject if we're on a documentation page
-      const isDocPage = document.querySelector('article') || 
-                       document.querySelector('.markdown') ||
-                       document.querySelector('[class*="docPage"]');
-      if (isDocPage) {
-        tryInject();
-      }
-    }
-  }, 1000); // Check every second instead of every 2 seconds
 } 

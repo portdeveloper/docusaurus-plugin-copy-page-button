@@ -1,3 +1,23 @@
+
+
+/* Push down sidebar content to make room for fixed button */
+.table-of-contents,
+.theme-doc-toc-desktop,
+[class*="tableOfContents"],
+.theme-doc-sidebar-container .theme-doc-sidebar,
+.theme-doc-toc-mobile {
+  padding-top: 60px !important;
+}
+
+/* Ensure the button container doesn't interfere with page layout */
+#copy-page-button-container {
+  pointer-events: none;
+}
+
+#copy-page-button-container > * {
+  pointer-events: auto;
+}
+
 .copyPageContainer {
   position: relative;
   display: inline-block;
