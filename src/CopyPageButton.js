@@ -24,16 +24,13 @@ export default function CopyPageButton() {
     };
   }, [isOpen]);
 
-  // Track URL changes
   useEffect(() => {
     const updateUrl = () => setCurrentUrl(window.location.href);
-    updateUrl(); // Set initial URL
+    updateUrl(); 
     
-    // Listen for navigation changes (for SPA routing)
     const observer = new MutationObserver(updateUrl);
     observer.observe(document, { subtree: true, childList: true });
     
-    // Also listen for popstate events
     window.addEventListener('popstate', updateUrl);
     
     return () => {
@@ -167,17 +164,14 @@ export default function CopyPageButton() {
             if (node.parentElement?.tagName.toLowerCase() === "pre") {
               return children;
             }
-            // Clean inline code content
             const cleanInlineCode = children
               .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width spaces
               .replace(/\u00A0/g, " ") // Replace non-breaking spaces
               .trim();
             return `\`${cleanInlineCode}\``;
           case "pre":
-            // Handle Docusaurus code blocks properly
             const codeElement = node.querySelector("code");
             if (codeElement) {
-              // Try to get language from various possible class patterns
               const language =
                 (codeElement.className?.match(/language-(\w+)/) ||
                   node.className?.match(/language-(\w+)/) ||
@@ -327,13 +321,7 @@ export default function CopyPageButton() {
       await navigator.clipboard.writeText(text);
       console.log("Content copied to clipboard");
     } catch (err) {
-      // Fallback for older browsers
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textArea);
+      console.log(err)
     }
   };
 
