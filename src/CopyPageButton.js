@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import styles from "./styles.module.css";
 
 // Move static selectors outside component to avoid recreation
@@ -26,11 +27,14 @@ export default function CopyPageButton() {
   const [pageContent, setPageContent] = useState("");
   const [pageTitle, setPageTitle] = useState("");
   const [currentUrl, setCurrentUrl] = useState("");
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef(null);
+  const buttonRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+          buttonRef.current && !buttonRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
@@ -42,6 +46,16 @@ export default function CopyPageButton() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + 8,
+        left: rect.right - 300, // Align dropdown right edge with button
+      });
+    }
   }, [isOpen]);
 
   useEffect(() => {
@@ -418,42 +432,54 @@ Please provide a clear summary and help me understand the key concepts covered i
   ];
 
   return (
-    <div className={styles.copyPageContainer} ref={dropdownRef}>
-      <button
-        className={styles.copyPageButton}
-        onClick={() => setIsOpen(!isOpen)}
-        aria-expanded={isOpen}
-        aria-haspopup="true"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
+    <>
+      <div className={styles.copyPageContainer}>
+        <button
+          className={styles.copyPageButton}
+          onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen}
+          aria-haspopup="true"
+          ref={buttonRef}
         >
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-        </svg>
-        Copy page
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className={
-            isOpen ? `${styles.chevron} ${styles.open}` : styles.chevron
-          }
-        >
-          <polyline points="6,9 12,15 18,9"></polyline>
-        </svg>
-      </button>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Copy page
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            className={
+              isOpen ? `${styles.chevron} ${styles.open}` : styles.chevron
+            }
+          >
+            <polyline points="6,9 12,15 18,9"></polyline>
+          </svg>
+        </button>
+      </div>
 
-      {isOpen && (
-        <div className={styles.copyPageDropdown}>
+      {isOpen && createPortal(
+        <div 
+          className={styles.copyPageDropdown} 
+          style={{ 
+            position: 'fixed',
+            top: `${dropdownPosition.top}px`, 
+            left: `${dropdownPosition.left}px`,
+            zIndex: 10000
+          }}
+          ref={dropdownRef}
+        >
           {dropdownItems.map((item) => (
             <button
               key={item.id}
@@ -470,8 +496,9 @@ Please provide a clear summary and help me understand the key concepts covered i
               </div>
             </button>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
-    </div>
+    </>
   );
 } 
