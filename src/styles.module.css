@@ -155,6 +155,12 @@
   color: #656d76;
 }
 
+:global(#copy-page-button-container) {
+  @media (max-width: 996px) {
+    display: none !important;
+  }
+}
+
 @media (max-width: 768px) {
   .copyPageDropdown {
     right: -16px;
