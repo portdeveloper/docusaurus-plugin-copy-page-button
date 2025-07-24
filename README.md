@@ -58,6 +58,46 @@ import { CopyPageButton } from 'docusaurus-plugin-copy-page-button';
 | `enableMarkdownView` | `boolean` | `true` | Show markdown preview option |
 | `customPrompt` | `string` | `'Please analyze this documentation page:'` | Custom AI prompt |
 
+## Local Development
+
+To test this plugin locally during development:
+
+### 1. Clone and setup
+```bash
+git clone https://github.com/your-username/docusaurus-plugin-copy-page-button.git
+cd docusaurus-plugin-copy-page-button
+npm install
+```
+
+### 2. Link the package
+```bash
+npm link
+```
+
+### 3. Use in your Docusaurus project
+Navigate to your Docusaurus project and link the local plugin:
+
+```bash
+cd /path/to/your/docusaurus/project
+npm link docusaurus-plugin-copy-page-button
+```
+
+### 4. Configure in docusaurus.config.js
+Add the plugin to your config:
+
+```js
+module.exports = {
+  plugins: ['docusaurus-plugin-copy-page-button'],
+};
+```
+
+### 5. Start development server
+```bash
+npm start
+```
+
+The locally linked plugin will now be active in your Docusaurus site. Any changes you make to the plugin source will require restarting the Docusaurus development server.
+
 ## How It Works
 
 The plugin intelligently extracts page content by:
