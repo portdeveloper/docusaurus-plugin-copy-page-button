@@ -1,5 +1,7 @@
 # Docusaurus Copy Page Button Plugin
 
+<img src="https://github.com/user-attachments/assets/2b91c2c9-97e7-4854-82dd-e1b6caa6511e" alt="Docusaurus Copy Page Button Plugin Preview" width="449" height="392" />
+
 A lightweight Docusaurus plugin that adds a "Copy page" button to your documentation site, making it easy for users to extract page content as markdown for use with LLMs and AI tools.
 
 ## Features
