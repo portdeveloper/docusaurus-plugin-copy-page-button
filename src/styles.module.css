@@ -153,19 +153,49 @@
   color: #656d76;
 }
 
+/* Hide the "Copy page" text on smaller screens (below 768px) */
+@media (max-width: 767px) {
+  .copyPageText {
+    display: none;
+  }
+}
+
+/* Force breadcrumbs to wrap earlier to avoid overlap with copy button */
+:global(.theme-doc-breadcrumbs) {
+  /* Reserve space for copy button on smaller screens */
+  @media (max-width: 996px) {
+    max-width: calc(100% - 120px); /* Reserve 120px for copy button */
+    flex-wrap: wrap;
+  }
+  
+  @media (max-width: 768px) {
+    max-width: calc(100% - 80px); /* Reserve 80px for icon-only button */
+  }
+  
+  @media (max-width: 480px) {
+    max-width: calc(100% - 60px); /* Reserve 60px for very small screens */
+  }
+}
+
+/* Ensure breadcrumb items can wrap */
+:global(.theme-doc-breadcrumbs .breadcrumbs__item) {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+/* Make breadcrumb links wrap text if needed */
+:global(.theme-doc-breadcrumbs .breadcrumbs__link) {
+  white-space: normal;
+  word-break: break-word;
+  hyphens: auto;
+}
+
 :global(#copy-page-button-container) {
   @media (max-width: 996px) {
     position: absolute;
-    right: 190px;
-    top: 12px;
-    z-index: 100000;
-  }
-
-  @media (max-width: 768px) {
-    position: absolute;
-    right: 64px;
-    top: 12px;
-    z-index: 100000;
+    right: 16px;
+    top: 75px;
+    z-index: 50;
   }
 }
 
@@ -173,12 +203,4 @@
   .copyPageDropdown {
     max-width: 300px;
   }
-}
-
-@media (max-width: 768px) {
-  /* .copyPageDropdown {
-    right: -16px;
-    left: -16px;
-    min-width: auto;
-  } */
 }
