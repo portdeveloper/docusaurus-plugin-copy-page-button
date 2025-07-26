@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import styles from "./styles.module.css";
 
+// Static selectors for content cleanup
 const SELECTORS_TO_REMOVE = [
   ".theme-edit-this-page",
-  ".theme-last-updated",
+  ".theme-last-updated", 
   ".pagination-nav",
   ".theme-doc-breadcrumbs",
   ".theme-doc-footer",
@@ -25,12 +26,8 @@ export default function CopyPageButton() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+          buttonRef.current && !buttonRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
@@ -59,15 +56,17 @@ export default function CopyPageButton() {
       const mainContent =
         document.querySelector("main article") ||
         document.querySelector("main .markdown");
-
+      
       if (!mainContent) return;
 
       const clone = mainContent.cloneNode(true);
 
+      // Remove unwanted elements
       SELECTORS_TO_REMOVE.forEach((selector) => {
         clone.querySelectorAll(selector).forEach((el) => el.remove());
       });
 
+      // Extract title from first H1 and remove it from content
       const firstH1 = clone.querySelector("h1");
       const title = firstH1?.textContent.trim() || "Documentation Page";
       if (firstH1) {
@@ -101,30 +100,39 @@ export default function CopyPageButton() {
 
       if (node.nodeType === Node.ELEMENT_NODE) {
         const tag = node.tagName.toLowerCase();
-        const childResults = Array.from(node.childNodes).map((child) =>
-          processNode(child)
-        );
-
-        const children = childResults
-          .filter(Boolean)
-          .reduce((acc, current, index, arr) => {
-            if (index === 0) return current;
-            const previous = arr[index - 1];
-            const needsSpace =
-              previous &&
-              !previous.match(/[\s\n]$/) &&
-              !current.match(/^[\s\n]/) &&
-              previous.trim() &&
-              current.trim();
-            return acc + (needsSpace ? " " : "") + current;
-          }, "");
-
-        if (tag.match(/^h[1-6]$/)) {
-          const level = "#".repeat(parseInt(tag[1]));
-          return `\n${level} ${children.trim()}\n\n`;
+        const childResults = Array.from(node.childNodes).map((child) => processNode(child));
+        
+        // Join child results with intelligent spacing
+        let children = "";
+        for (let i = 0; i < childResults.length; i++) {
+          const current = childResults[i];
+          const previous = i > 0 ? childResults[i - 1] : "";
+          
+          if (current) {
+            if (previous && 
+                !previous.match(/[\s\n]$/) && 
+                !current.match(/^[\s\n]/) &&
+                previous.trim() && 
+                current.trim()) {
+              children += " ";
+            }
+            children += current;
+          }
         }
 
         switch (tag) {
+          case "h1":
+            return `\n# ${children.trim()}\n\n`;
+          case "h2":
+            return `\n## ${children.trim()}\n\n`;
+          case "h3":
+            return `\n### ${children.trim()}\n\n`;
+          case "h4":
+            return `\n#### ${children.trim()}\n\n`;
+          case "h5":
+            return `\n##### ${children.trim()}\n\n`;
+          case "h6":
+            return `\n###### ${children.trim()}\n\n`;
           case "p":
             return children.trim() ? `${children.trim()}\n\n` : "\n";
           case "strong":
@@ -137,7 +145,11 @@ export default function CopyPageButton() {
             if (node.parentElement?.tagName.toLowerCase() === "pre") {
               return children;
             }
-            return `\`${cleanText(children)}\``;
+            const cleanInlineCode = children
+              .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width spaces
+              .replace(/\u00A0/g, " ") // Replace non-breaking spaces
+              .trim();
+            return `\`${cleanInlineCode}\``;
           case "pre":
             const codeElement = node.querySelector("code");
             if (codeElement) {
@@ -152,18 +164,15 @@ export default function CopyPageButton() {
 
               try {
                 // Method 1: Try to get content from data attributes (some themes store original content)
-                const originalContent =
-                  codeElement.getAttribute("data-code") ||
-                  node.getAttribute("data-code") ||
-                  codeElement.getAttribute("data-raw");
-
+                const originalContent = codeElement.getAttribute('data-code') || 
+                                      node.getAttribute('data-code') ||
+                                      codeElement.getAttribute('data-raw');
+                
                 if (originalContent) {
                   codeContent = originalContent;
                 } else {
                   // Method 2: Look for individual code lines in specific containers
-                  const codeLines = codeElement.querySelectorAll(
-                    "span[data-line], .token-line, .code-line, .highlight-line"
-                  );
+                  const codeLines = codeElement.querySelectorAll("span[data-line], .token-line, .code-line, .highlight-line");
                   if (codeLines.length > 0) {
                     codeContent = Array.from(codeLines)
                       .map((lineElement) => {
@@ -181,7 +190,7 @@ export default function CopyPageButton() {
                             lineDiv.className?.includes("codeLineNumber") ||
                             lineDiv.className?.includes("LineNumber") ||
                             lineDiv.className?.includes("line-number") ||
-                            lineDiv.style?.userSelect === "none"
+                            lineDiv.style?.userSelect === 'none'
                           ) {
                             return null;
                           }
@@ -192,24 +201,31 @@ export default function CopyPageButton() {
                     } else {
                       // Method 4: Direct text extraction with cleanup
                       let rawText = codeElement.textContent || "";
-
+                      
                       // Remove line numbers at the start of lines (common pattern: "1 ", "12 ", etc.)
                       rawText = rawText.replace(/^\d+\s+/gm, "");
-
+                      
                       // Remove copy button text and other UI elements
                       rawText = rawText.replace(/^Copy$/gm, "");
                       rawText = rawText.replace(/^Copied!$/gm, "");
-                      rawText = rawText.replace(
-                        /^\s*Copy to clipboard\s*$/gm,
-                        ""
-                      );
-
+                      rawText = rawText.replace(/^\s*Copy to clipboard\s*$/gm, "");
+                      
                       codeContent = rawText;
                     }
                   }
                 }
-                codeContent = cleanText(codeContent).replace(/^\n+|\n+$/g, "");
+
+                // Final cleanup
+                codeContent = codeContent
+                  .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width spaces
+                  .replace(/\u00A0/g, " ") // Replace non-breaking spaces
+                  .trim();
+
+                // Remove empty lines at start and end
+                codeContent = codeContent.replace(/^\n+|\n+$/g, "");
+
               } catch (error) {
+                // Fallback to simple text extraction if anything fails
                 codeContent = codeElement.textContent || "";
               }
 
@@ -257,6 +273,7 @@ export default function CopyPageButton() {
           case "div":
           case "section":
           case "article":
+            // Handle admonitions
             if (node.classList?.contains("admonition")) {
               const type =
                 Array.from(node.classList)
@@ -280,7 +297,11 @@ export default function CopyPageButton() {
   };
 
   const copyToClipboard = async (text) => {
-    await navigator.clipboard.writeText(text);
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (err) {
+      // Silently fail - clipboard API may not be available
+    }
   };
 
   const openInAI = (baseUrl) => {
@@ -419,39 +440,36 @@ Please provide a clear summary and help me understand the key concepts covered i
         </button>
       </div>
 
-      {isOpen &&
-        createPortal(
-          <div
-            className={styles.copyPageDropdown}
-            style={{
-              position: "fixed",
-              top: `${dropdownPosition.top}px`,
-              left: `${dropdownPosition.left}px`,
-              zIndex: 10000,
-            }}
-            ref={dropdownRef}
-          >
-            {dropdownItems.map((item) => (
-              <button
-                key={item.id}
-                className={styles.dropdownItem}
-                onClick={() => {
-                  item.action();
-                  setIsOpen(false);
-                }}
-              >
-                {item.icon}
-                <div>
-                  <div className={styles.itemTitle}>{item.title}</div>
-                  <div className={styles.itemDescription}>
-                    {item.description}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>,
-          document.body
-        )}
+      {isOpen && createPortal(
+        <div 
+          className={styles.copyPageDropdown} 
+          style={{ 
+            position: 'fixed',
+            top: `${dropdownPosition.top}px`, 
+            left: `${dropdownPosition.left}px`,
+            zIndex: 10000
+          }}
+          ref={dropdownRef}
+        >
+          {dropdownItems.map((item) => (
+            <button
+              key={item.id}
+              className={styles.dropdownItem}
+              onClick={() => {
+                item.action();
+                setIsOpen(false);
+              }}
+            >
+              {item.icon}
+              <div>
+                <div className={styles.itemTitle}>{item.title}</div>
+                <div className={styles.itemDescription}>{item.description}</div>
+              </div>
+            </button>
+          ))}
+        </div>,
+        document.body
+      )}
     </>
   );
-}
+} 
