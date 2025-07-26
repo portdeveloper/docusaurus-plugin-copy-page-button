@@ -17,12 +17,49 @@ const SELECTORS_TO_REMOVE = [
   ".line-number",
 ];
 
-export default function CopyPageButton() {
+// Utility function to merge custom styles with default classes
+const mergeStyles = (defaultClassName, customStyleConfig = {}) => {
+  const { className: customClassName, style: customStyle } = customStyleConfig;
+  
+  const finalClassName = customClassName 
+    ? `${defaultClassName} ${customClassName}`
+    : defaultClassName;
+    
+  return {
+    className: finalClassName,
+    style: customStyle || {}
+  };
+};
+
+// Utility function to separate positioning styles from other styles
+const separatePositioningStyles = (styleObject = {}) => {
+  const positioningProps = ['position', 'top', 'right', 'bottom', 'left', 'zIndex', 'transform'];
+  const positioning = {};
+  const nonPositioning = {};
+  
+  Object.entries(styleObject).forEach(([key, value]) => {
+    if (positioningProps.includes(key)) {
+      positioning[key] = value;
+    } else {
+      nonPositioning[key] = value;
+    }
+  });
+  
+  return { positioning, nonPositioning };
+};
+
+export default function CopyPageButton({ customStyles = {} }) {
   const [isOpen, setIsOpen] = useState(false);
   const [pageContent, setPageContent] = useState("");
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
+
+  // Extract custom style configurations
+  const containerStyleConfig = customStyles.container || {};
+  const buttonStyleConfig = customStyles.button || {};
+  const dropdownStyleConfig = customStyles.dropdown || {};
+  const dropdownItemStyleConfig = customStyles.dropdownItem || {};
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -415,11 +452,39 @@ Please provide a clear summary and help me understand the key concepts covered i
     },
   ];
 
+  // Handle positioning styles - if button config has positioning, move it to container
+  const { positioning: buttonPositioning, nonPositioning: buttonNonPositioning } = 
+    separatePositioningStyles(buttonStyleConfig.style);
+  
+  // Create final style configs
+  const finalContainerConfig = {
+    ...containerStyleConfig,
+    style: {
+      ...containerStyleConfig.style,
+      ...buttonPositioning, // Apply button positioning to container
+    }
+  };
+  
+  const finalButtonConfig = {
+    ...buttonStyleConfig,
+    style: buttonNonPositioning, // Apply only non-positioning styles to button
+  };
+
+  // Merge custom styles with default styles
+  const containerProps = mergeStyles(styles.copyPageContainer, finalContainerConfig);
+  const buttonProps = mergeStyles(styles.copyPageButton, finalButtonConfig);
+  const dropdownProps = mergeStyles(styles.copyPageDropdown, dropdownStyleConfig);
+  const dropdownItemProps = mergeStyles(styles.dropdownItem, dropdownItemStyleConfig);
+
   return (
     <>
-      <div className={styles.copyPageContainer}>
+      <div 
+        className={containerProps.className}
+        style={containerProps.style}
+      >
         <button
-          className={styles.copyPageButton}
+          className={buttonProps.className}
+          style={buttonProps.style}
           onClick={() => setIsOpen(!isOpen)}
           aria-expanded={isOpen}
           aria-haspopup="true"
@@ -456,19 +521,21 @@ Please provide a clear summary and help me understand the key concepts covered i
       {isOpen &&
         createPortal(
           <div
-            className={styles.copyPageDropdown}
+            className={dropdownProps.className}
             style={{
               position: "fixed",
               top: `${dropdownPosition.top}px`,
               left: `${dropdownPosition.left}px`,
               zIndex: 10000,
+              ...dropdownProps.style
             }}
             ref={dropdownRef}
           >
             {dropdownItems.map((item) => (
               <button
                 key={item.id}
-                className={styles.dropdownItem}
+                className={dropdownItemProps.className}
+                style={dropdownItemProps.style}
                 onClick={() => {
                   item.action();
                   setIsOpen(false);

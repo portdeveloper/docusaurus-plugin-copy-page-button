@@ -6,6 +6,10 @@ if (typeof window !== "undefined") {
   let root = null;
   let lastUrl = location.href;
 
+  const getPluginOptions = () => {
+    return (typeof window !== "undefined" && window.__COPY_PAGE_BUTTON_OPTIONS__) || {};
+  };
+
   const injectCopyPageButton = () => {
     const sidebar =
       document.querySelector(".theme-doc-toc-desktop") ||
@@ -28,6 +32,23 @@ if (typeof window !== "undefined") {
     container = document.createElement("div");
     container.id = "copy-page-button-container";
 
+    // Apply custom positioning styles to the container if provided
+    const pluginOptions = getPluginOptions();
+    const customStyles = pluginOptions.customStyles || {};
+    const buttonStyles = customStyles.button?.style || {};
+    
+    // Check if button config has positioning styles that should be applied to container
+    const positioningProps = ['position', 'top', 'right', 'bottom', 'left', 'zIndex', 'transform'];
+    positioningProps.forEach(prop => {
+      if (buttonStyles[prop] !== undefined) {
+        container.style[prop] = buttonStyles[prop];
+      }
+    });
+    
+    // Also apply container-specific styles
+    const containerStyles = customStyles.container?.style || {};
+    Object.assign(container.style, containerStyles);
+
     sidebar.insertBefore(container, sidebar.firstChild);
 
     if (root) {
@@ -38,7 +59,9 @@ if (typeof window !== "undefined") {
       }
     }
     root = createRoot(container);
-    root.render(React.createElement(CopyPageButton));
+    
+    const renderOptions = getPluginOptions();
+    root.render(React.createElement(CopyPageButton, { customStyles: renderOptions.customStyles }));
   };
 
   const cleanup = () => {

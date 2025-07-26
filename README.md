@@ -9,6 +9,7 @@ A lightweight Docusaurus plugin that adds a "Copy page" button to your documenta
 - 🤖 **AI integration** - Direct "Open in ChatGPT" and "Open in Claude" buttons
 - ⚡ **Auto-injection** - Automatically adds to navbar (no configuration needed)
 - 🎨 **Theme-aware** - Supports light/dark themes
+- 🎨 **Customizable styling** - Easy custom CSS classes and inline styles
 - 📱 **Mobile-friendly** - Responsive design
 - 🛠️ **Zero-config** - Works out of the box with sensible defaults
 
@@ -43,7 +44,115 @@ import CopyPageButton from "docusaurus-plugin-copy-page-button";
 <CopyPageButton />
 ```
 
-**Note**: The component currently doesn't accept props - all features are enabled by default with fixed settings.
+## Configuration
+
+### Custom Styling
+
+You can customize the appearance of the copy page button by passing a `customStyles` option:
+
+```js
+module.exports = {
+  plugins: [
+    [
+      "docusaurus-plugin-copy-page-button",
+      {
+        customStyles: {
+          button: {
+            className: "my-custom-button",
+            style: {
+              backgroundColor: "#4CAF50",
+              color: "white",
+              borderRadius: "8px",
+            },
+          },
+          dropdown: {
+            className: "my-custom-dropdown",
+            style: {
+              backgroundColor: "#f8f9fa",
+              border: "2px solid #4CAF50",
+            },
+          },
+          dropdownItem: {
+            style: {
+              padding: "12px 20px",
+              fontSize: "16px",
+            },
+          },
+          container: {
+            className: "my-button-container",
+          },
+        },
+      },
+    ],
+  ],
+};
+```
+
+#### Available Style Targets
+
+- **`button`** - The main copy page button (positioning styles like `position`, `top`, `left` are automatically applied to the container)
+- **`dropdown`** - The dropdown menu that appears when clicking the button
+- **`dropdownItem`** - Individual items in the dropdown menu
+- **`container`** - The wrapper container around the button
+
+#### Style Options
+
+Each target accepts:
+- **`className`** - CSS class name(s) to add to the element
+- **`style`** - Inline styles object (React style format)
+
+Custom styles are merged with the default styles, so you only need to specify what you want to change.
+
+#### Example: Custom positioning
+
+```js
+module.exports = {
+  plugins: [
+    [
+      "docusaurus-plugin-copy-page-button",
+      {
+        customStyles: {
+          button: {
+            style: {
+              position: "fixed",
+              top: "100px",
+              left: "100px",
+              zIndex: 1000,
+            },
+          },
+        },
+      },
+    ],
+  ],
+};
+```
+
+**Note**: Positioning styles (`position`, `top`, `right`, `bottom`, `left`, `zIndex`, `transform`) specified in the `button` configuration are automatically applied to the container element for proper positioning control.
+
+#### Example: Styling without positioning
+
+```js
+module.exports = {
+  plugins: [
+    [
+      "docusaurus-plugin-copy-page-button",
+      {
+        customStyles: {
+          button: {
+            style: {
+              backgroundColor: "transparent",
+              border: "2px solid #007acc",
+              color: "#007acc",
+              borderRadius: "12px",
+              fontWeight: "bold",
+            },
+          },
+        },
+      },
+    ],
+  ],
+};
+```
 
 ## Local Development
 
