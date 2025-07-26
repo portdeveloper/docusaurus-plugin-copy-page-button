@@ -15,7 +15,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/portdeveloper/docusaurus-plugin-copy-page-button.git"
+    "url": "git+https://github.com/portdeveloper/docusaurus-plugin-copy-page-button.git"
   },
   "homepage": "https://github.com/portdeveloper/docusaurus-plugin-copy-page-button#readme",
   "bugs": {
