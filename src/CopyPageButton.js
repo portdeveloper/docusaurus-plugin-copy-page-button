@@ -317,7 +317,6 @@ export default function CopyPageButton() {
   const copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      console.log("Content copied to clipboard");
     } catch (err) {
       console.log(err)
     }
