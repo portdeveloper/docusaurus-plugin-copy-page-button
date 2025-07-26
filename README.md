@@ -25,7 +25,7 @@ Add the plugin to your `docusaurus.config.js`:
 
 ```js
 module.exports = {
-  plugins: ['docusaurus-plugin-copy-page-button'],
+  plugins: ["docusaurus-plugin-copy-page-button"],
 };
 ```
 
@@ -36,33 +36,34 @@ The button will automatically appear in your navbar!
 Import and use the component manually:
 
 ```jsx
-import { CopyPageButton } from 'docusaurus-plugin-copy-page-button';
+import { CopyPageButton } from "docusaurus-plugin-copy-page-button";
 
 // In your custom navbar or anywhere else
-<CopyPageButton 
+<CopyPageButton
   buttonText="Copy page"
   enableChatGPT={true}
   enableClaude={true}
   enableMarkdownView={true}
   customPrompt="Please analyze this documentation:"
-/>
+/>;
 ```
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `buttonText` | `string` | `'Copy page'` | Text displayed on the button |
-| `enableChatGPT` | `boolean` | `true` | Show ChatGPT integration |
-| `enableClaude` | `boolean` | `true` | Show Claude integration |
-| `enableMarkdownView` | `boolean` | `true` | Show markdown preview option |
-| `customPrompt` | `string` | `'Please analyze this documentation page:'` | Custom AI prompt |
+| Prop                 | Type      | Default                                     | Description                  |
+| -------------------- | --------- | ------------------------------------------- | ---------------------------- |
+| `buttonText`         | `string`  | `'Copy page'`                               | Text displayed on the button |
+| `enableChatGPT`      | `boolean` | `true`                                      | Show ChatGPT integration     |
+| `enableClaude`       | `boolean` | `true`                                      | Show Claude integration      |
+| `enableMarkdownView` | `boolean` | `true`                                      | Show markdown preview option |
+| `customPrompt`       | `string`  | `'Please analyze this documentation page:'` | Custom AI prompt             |
 
 ## Local Development
 
 To test this plugin locally during development:
 
 ### 1. Clone and setup
+
 ```bash
 git clone https://github.com/your-username/docusaurus-plugin-copy-page-button.git
 cd docusaurus-plugin-copy-page-button
@@ -70,11 +71,13 @@ npm install
 ```
 
 ### 2. Link the package
+
 ```bash
 npm link
 ```
 
 ### 3. Use in your Docusaurus project
+
 Navigate to your Docusaurus project and link the local plugin:
 
 ```bash
@@ -83,15 +86,17 @@ npm link docusaurus-plugin-copy-page-button
 ```
 
 ### 4. Configure in docusaurus.config.js
+
 Add the plugin to your config:
 
 ```js
 module.exports = {
-  plugins: ['docusaurus-plugin-copy-page-button'],
+  plugins: ["docusaurus-plugin-copy-page-button"],
 };
 ```
 
 ### 5. Start development server
+
 ```bash
 npm start
 ```

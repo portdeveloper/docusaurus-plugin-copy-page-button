@@ -167,11 +167,11 @@
     max-width: calc(100% - 120px); /* Reserve 120px for copy button */
     flex-wrap: wrap;
   }
-  
+
   @media (max-width: 768px) {
     max-width: calc(100% - 80px); /* Reserve 80px for icon-only button */
   }
-  
+
   @media (max-width: 480px) {
     max-width: calc(100% - 60px); /* Reserve 60px for very small screens */
   }
