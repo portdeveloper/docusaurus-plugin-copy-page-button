@@ -25,7 +25,6 @@ const SELECTORS_TO_REMOVE = [
 export default function CopyPageButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [pageContent, setPageContent] = useState("");
-  const [pageTitle, setPageTitle] = useState("");
   const [currentUrl, setCurrentUrl] = useState("");
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef(null);
@@ -89,7 +88,6 @@ export default function CopyPageButton() {
       const title = firstH1?.textContent.trim() || "Documentation Page";
       if (firstH1) {
         firstH1.remove();
-        setPageTitle(title);
       }
 
       const content = convertToMarkdown(clone);
