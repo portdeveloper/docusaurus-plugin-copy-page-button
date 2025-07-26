@@ -1,6 +1,6 @@
 {
   "name": "docusaurus-plugin-copy-page-button",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Docusaurus plugin that provides a copy page button for extracting content as markdown for LLMs",
   "main": "src/index.js",
   "keywords": [
