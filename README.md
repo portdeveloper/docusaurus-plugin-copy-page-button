@@ -5,11 +5,12 @@ A lightweight Docusaurus plugin that adds a "Copy page" button to your documenta
 ## Features
 
 - 📋 **Copy page as markdown** - Clean page content extraction
-- 👁️ **View as markdown** - Preview extracted content
-- 🤖 **AI integration** - Direct links to ChatGPT and Claude
-- ⚡ **Auto-injection** - Automatically adds to navbar
+- 👁️ **View as markdown** - Preview extracted content in modal
+- 🤖 **AI integration** - Direct "Open in ChatGPT" and "Open in Claude" buttons
+- ⚡ **Auto-injection** - Automatically adds to navbar (no configuration needed)
 - 🎨 **Theme-aware** - Supports light/dark themes
 - 📱 **Mobile-friendly** - Responsive design
+- 🛠️ **Zero-config** - Works out of the box with sensible defaults
 
 ## Installation
 
@@ -36,27 +37,13 @@ The button will automatically appear in your navbar!
 Import and use the component manually:
 
 ```jsx
-import { CopyPageButton } from "docusaurus-plugin-copy-page-button";
+import CopyPageButton from "docusaurus-plugin-copy-page-button";
 
 // In your custom navbar or anywhere else
-<CopyPageButton
-  buttonText="Copy page"
-  enableChatGPT={true}
-  enableClaude={true}
-  enableMarkdownView={true}
-  customPrompt="Please analyze this documentation:"
-/>;
+<CopyPageButton />
 ```
 
-## Props
-
-| Prop                 | Type      | Default                                     | Description                  |
-| -------------------- | --------- | ------------------------------------------- | ---------------------------- |
-| `buttonText`         | `string`  | `'Copy page'`                               | Text displayed on the button |
-| `enableChatGPT`      | `boolean` | `true`                                      | Show ChatGPT integration     |
-| `enableClaude`       | `boolean` | `true`                                      | Show Claude integration      |
-| `enableMarkdownView` | `boolean` | `true`                                      | Show markdown preview option |
-| `customPrompt`       | `string`  | `'Please analyze this documentation page:'` | Custom AI prompt             |
+**Note**: The component currently doesn't accept props - all features are enabled by default with fixed settings.
 
 ## Local Development
 
@@ -65,7 +52,7 @@ To test this plugin locally during development:
 ### 1. Clone and setup
 
 ```bash
-git clone https://github.com/your-username/docusaurus-plugin-copy-page-button.git
+git clone https://github.com/portdeveloper/docusaurus-plugin-copy-page-button.git
 cd docusaurus-plugin-copy-page-button
 npm install
 ```
