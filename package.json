@@ -13,6 +13,14 @@
   ],
   "author": "portdeveloper",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/portdeveloper/docusaurus-plugin-copy-page-button.git"
+  },
+  "homepage": "https://github.com/portdeveloper/docusaurus-plugin-copy-page-button#readme",
+  "bugs": {
+    "url": "https://github.com/portdeveloper/docusaurus-plugin-copy-page-button/issues"
+  },
   "peerDependencies": {
     "@docusaurus/core": "^3.0.0",
     "react": "^18.0.0",
