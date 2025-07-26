@@ -157,14 +157,32 @@
 
 :global(#copy-page-button-container) {
   @media (max-width: 996px) {
-    display: none !important;
+    position: absolute;
+    right: 190px;
+    top: 12px;
+    z-index: 100000;
+  }
+
+  @media (max-width: 768px) {
+    position: absolute;
+    right: 64px;
+    top: 12px;
+    z-index: 100000;
+  }
+
+
+}
+
+@media (max-width: 996px) {
+  .copyPageDropdown {
+    max-width: 300px;
   }
 }
 
 @media (max-width: 768px) {
-  .copyPageDropdown {
+  /* .copyPageDropdown {
     right: -16px;
     left: -16px;
     min-width: auto;
-  }
+  } */
 } 
