@@ -9,6 +9,3 @@ module.exports = function copyPageButtonPlugin() {
     }
   };
 };
-
-// Export the component for manual usage
-// Component export removed - use client-side injection instead 
