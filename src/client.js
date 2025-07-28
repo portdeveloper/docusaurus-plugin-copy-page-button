@@ -1,16 +1,22 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import CopyPageButton from "./CopyPageButton";
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 
-if (typeof window !== "undefined") {
+// Only run in browser environment
+if (ExecutionEnvironment.canUseDOM) {
   let root = null;
   let lastUrl = location.href;
+  let isInitialized = false;
+  let recheckInterval = null;
+  let injectionAttempts = 0;
 
   const getPluginOptions = () => {
     return (typeof window !== "undefined" && window.__COPY_PAGE_BUTTON_OPTIONS__) || {};
   };
 
-  const injectCopyPageButton = () => {
+  // Fast injection for navigation (when sidebar already exists)
+  const fastInjectCopyPageButton = () => {
     const sidebar =
       document.querySelector(".theme-doc-toc-desktop") ||
       document.querySelector(".table-of-contents") ||
@@ -18,12 +24,15 @@ if (typeof window !== "undefined") {
       document.querySelector('[class*="toc"]');
 
     if (!sidebar) {
-      setTimeout(injectCopyPageButton, 100);
+      // If no sidebar, fallback to slow reliable method
+      reliableInjectCopyPageButton();
       return;
     }
 
     let container = document.getElementById("copy-page-button-container");
-    if (container && sidebar.contains(container)) return;
+    if (container && sidebar.contains(container)) {
+      return; // Already properly attached
+    }
 
     if (container) {
       cleanup();
@@ -55,13 +64,84 @@ if (typeof window !== "undefined") {
       try {
         root.unmount();
       } catch (e) {
-        // Ignore unmount errors
+        // Silent cleanup
       }
     }
     root = createRoot(container);
     
     const renderOptions = getPluginOptions();
     root.render(React.createElement(CopyPageButton, { customStyles: renderOptions.customStyles }));
+  };
+
+  // Reliable injection for page refresh/initial load (when DOM might not be ready)
+  const reliableInjectCopyPageButton = () => {
+    injectionAttempts++;
+    
+    const sidebar =
+      document.querySelector(".theme-doc-toc-desktop") ||
+      document.querySelector(".table-of-contents") ||
+      document.querySelector('[class*="tableOfContents"]') ||
+      document.querySelector('[class*="toc"]');
+
+    if (!sidebar) {
+      if (injectionAttempts < 30) { // Try for 3 seconds max
+        setTimeout(reliableInjectCopyPageButton, 100);
+      }
+      return;
+    }
+
+    let container = document.getElementById("copy-page-button-container");
+    if (container && sidebar.contains(container)) {
+      injectionAttempts = 0; // Reset counter on success
+      return; // Already properly attached
+    }
+
+    if (container) {
+      cleanup();
+    }
+
+    container = document.createElement("div");
+    container.id = "copy-page-button-container";
+
+    // Apply custom positioning styles to the container if provided
+    const pluginOptions = getPluginOptions();
+    const customStyles = pluginOptions.customStyles || {};
+    const buttonStyles = customStyles.button?.style || {};
+    
+    // Check if button config has positioning styles that should be applied to container
+    const positioningProps = ['position', 'top', 'right', 'bottom', 'left', 'zIndex', 'transform'];
+    positioningProps.forEach(prop => {
+      if (buttonStyles[prop] !== undefined) {
+        container.style[prop] = buttonStyles[prop];
+      }
+    });
+    
+    // Also apply container-specific styles
+    const containerStyles = customStyles.container?.style || {};
+    Object.assign(container.style, containerStyles);
+
+    sidebar.insertBefore(container, sidebar.firstChild);
+
+    if (root) {
+      try {
+        root.unmount();
+      } catch (e) {
+        // Silent cleanup
+      }
+    }
+    root = createRoot(container);
+    
+    const renderOptions = getPluginOptions();
+    root.render(React.createElement(CopyPageButton, { customStyles: renderOptions.customStyles }));
+    
+    // Reset injection attempts on successful injection
+    injectionAttempts = 0;
+    
+    // Clear any existing recheck interval since button is now injected
+    if (recheckInterval) {
+      clearInterval(recheckInterval);
+      recheckInterval = null;
+    }
   };
 
   const cleanup = () => {
@@ -71,28 +151,127 @@ if (typeof window !== "undefined") {
         try {
           root.unmount();
         } catch (e) {
-          // Ignore unmount errors
+          // Silent cleanup
         }
       }
       container.remove();
     }
   };
 
+  // Fast route change handler (navigation within SPA)
   const handleRouteChange = () => {
     cleanup();
+    
+    // Clear any existing recheck interval
+    if (recheckInterval) {
+      clearInterval(recheckInterval);
+      recheckInterval = null;
+    }
+    
+    // Use fast injection for navigation since DOM is already stable
     if (window.innerWidth <= 996) {
-      // Mobile/tablet: delay to wait for sidebar re-rendering
-      setTimeout(injectCopyPageButton, 100);
+      // Mobile/tablet: small delay for sidebar re-rendering
+      setTimeout(fastInjectCopyPageButton, 50);
     } else {
-      injectCopyPageButton();
+      // Desktop: immediate injection
+      fastInjectCopyPageButton();
     }
   };
 
-  // Initial injection
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", injectCopyPageButton);
+  // Reliable initialization for page refresh/initial load
+  const initializeButton = () => {
+    if (isInitialized) {
+      return;
+    }
+    
+    isInitialized = true;
+    injectionAttempts = 0;
+    
+    // Multi-strategy initialization for page refresh
+    const attemptInjection = () => {
+      // Strategy 1: Try immediate injection
+      const sidebar = document.querySelector(".theme-doc-toc-desktop") ||
+        document.querySelector(".table-of-contents") ||
+        document.querySelector('[class*="tableOfContents"]') ||
+        document.querySelector('[class*="toc"]');
+        
+      if (sidebar) {
+        // Sidebar found - inject with reasonable delay
+        setTimeout(reliableInjectCopyPageButton, 100);
+      } else {
+        // Strategy 2: Wait for Docusaurus to fully load
+        if (window.docusaurus || document.readyState === 'complete') {
+          setTimeout(() => {
+            reliableInjectCopyPageButton();
+            // Start backup periodic checking
+            startPeriodicCheck();
+          }, 300);
+        } else {
+          // Strategy 3: Wait for framework readiness
+          setTimeout(() => {
+            reliableInjectCopyPageButton();
+            startPeriodicCheck();
+          }, 500);
+        }
+      }
+    };
+    
+    // Use appropriate timing based on document state
+    if (document.readyState === 'complete') {
+      attemptInjection();
+    } else {
+      // Wait for document to be complete
+      const waitForComplete = () => {
+        if (document.readyState === 'complete' || window.docusaurus) {
+          setTimeout(attemptInjection, 100);
+        } else {
+          setTimeout(waitForComplete, 100);
+        }
+      };
+      waitForComplete();
+    }
+  };
+
+  // Periodic check - only for initial page load issues
+  const startPeriodicCheck = () => {
+    let recheckCount = 0;
+    const maxRechecks = 15; // 7.5 seconds total
+    
+    // Clear any existing interval
+    if (recheckInterval) {
+      clearInterval(recheckInterval);
+    }
+    
+    recheckInterval = setInterval(() => {
+      recheckCount++;
+      const container = document.getElementById("copy-page-button-container");
+      const sidebar = document.querySelector(".theme-doc-toc-desktop") ||
+        document.querySelector(".table-of-contents") ||
+        document.querySelector('[class*="tableOfContents"]') ||
+        document.querySelector('[class*="toc"]');
+      
+      if (sidebar && !container) {
+        // Log only if we're having to retry (indicates potential issue)
+        if (recheckCount > 3) {
+          console.log('[Copy Button] Re-injecting after', recheckCount * 0.5, 'seconds');
+        }
+        reliableInjectCopyPageButton();
+      }
+      
+      if (recheckCount >= maxRechecks || (container && sidebar && sidebar.contains(container))) {
+        clearInterval(recheckInterval);
+        recheckInterval = null;
+      }
+    }, 500);
+  };
+
+  // Initialize when DOM is ready (only for page refresh/initial load)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(initializeButton, 100);
+    });
   } else {
-    injectCopyPageButton();
+    setTimeout(initializeButton, 100);
   }
 
   // Handle responsive layout changes
@@ -116,7 +295,7 @@ if (typeof window !== "undefined") {
 
       if (sidebarVisible && !buttonProperlyAttached) {
         cleanup();
-        injectCopyPageButton();
+        fastInjectCopyPageButton(); // Use fast injection for resize
       } else if (!sidebarVisible && buttonProperlyAttached) {
         cleanup();
       }
@@ -135,11 +314,11 @@ if (typeof window !== "undefined") {
   const checkUrlChange = () => {
     if (location.href !== lastUrl) {
       lastUrl = location.href;
-      handleRouteChange();
+      handleRouteChange(); // Use fast route change handler
     }
   };
 
-  // Check for URL changes every 100ms - much more efficient than MutationObserver
+  // Check for URL changes - keep this for SPA navigation
   setInterval(checkUrlChange, 100);
 
   // Also intercept pushState/replaceState for immediate detection

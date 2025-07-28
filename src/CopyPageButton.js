@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import useIsBrowser from '@docusaurus/useIsBrowser';
 import styles from "./styles.module.css";
 
 // Static selectors for content cleanup
@@ -54,6 +55,7 @@ export default function CopyPageButton({ customStyles = {} }) {
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
+  const isBrowser = useIsBrowser();
 
   // Extract custom style configurations
   const containerStyleConfig = customStyles.container || {};
@@ -93,6 +95,8 @@ export default function CopyPageButton({ customStyles = {} }) {
   }, [isOpen]);
 
   useEffect(() => {
+    if (!isBrowser) return;
+    
     const extractPageContent = () => {
       const mainContent =
         document.querySelector("main article") ||
@@ -120,7 +124,7 @@ export default function CopyPageButton({ customStyles = {} }) {
     };
 
     extractPageContent();
-  }, []);
+  }, [isBrowser]);
 
   const convertToMarkdown = (element) => {
     const cleanText = (text) => {
@@ -355,6 +359,8 @@ export default function CopyPageButton({ customStyles = {} }) {
   };
 
   const openInAI = (baseUrl) => {
+    if (!isBrowser) return;
+    
     const currentUrl = window.location.href;
     const prompt = encodeURIComponent(
       `Please read and explain this documentation page: ${currentUrl}
@@ -365,6 +371,8 @@ Please provide a clear summary and help me understand the key concepts covered i
   };
 
   const viewAsMarkdown = () => {
+    if (!isBrowser) return;
+    
     const blob = new Blob([pageContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     window.open(url, "_blank");
@@ -518,7 +526,7 @@ Please provide a clear summary and help me understand the key concepts covered i
         </button>
       </div>
 
-      {isOpen &&
+      {isOpen && isBrowser && (
         createPortal(
           <div
             className={dropdownProps.className}
@@ -552,7 +560,8 @@ Please provide a clear summary and help me understand the key concepts covered i
             ))}
           </div>,
           document.body
-        )}
+        )
+      )}
     </>
   );
 }
