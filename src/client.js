@@ -160,21 +160,34 @@ if (ExecutionEnvironment.canUseDOM) {
 
   // Fast route change handler (navigation within SPA)
   const handleRouteChange = () => {
-    cleanup();
+    // Check if button is properly attached before cleaning up
+    const container = document.getElementById("copy-page-button-container");
+    const sidebar =
+      document.querySelector(".theme-doc-toc-desktop") ||
+      document.querySelector(".table-of-contents") ||
+      document.querySelector('[class*="tableOfContents"]') ||
+      document.querySelector('[class*="toc"]');
     
-    // Clear any existing recheck interval
-    if (recheckInterval) {
-      clearInterval(recheckInterval);
-      recheckInterval = null;
-    }
+    const buttonProperlyAttached = container && sidebar && sidebar.contains(container);
     
-    // Use fast injection for navigation since DOM is already stable
-    if (window.innerWidth <= 996) {
-      // Mobile/tablet: small delay for sidebar re-rendering
-      setTimeout(fastInjectCopyPageButton, 50);
-    } else {
-      // Desktop: immediate injection
-      fastInjectCopyPageButton();
+    // Only cleanup and re-inject if button is not properly attached
+    if (!buttonProperlyAttached) {
+      cleanup();
+      
+      // Clear any existing recheck interval
+      if (recheckInterval) {
+        clearInterval(recheckInterval);
+        recheckInterval = null;
+      }
+      
+      // Use fast injection for navigation since DOM is already stable
+      if (window.innerWidth <= 996) {
+        // Mobile/tablet: small delay for sidebar re-rendering
+        setTimeout(fastInjectCopyPageButton, 50);
+      } else {
+        // Desktop: immediate injection
+        fastInjectCopyPageButton();
+      }
     }
   };
 
@@ -313,8 +326,17 @@ if (ExecutionEnvironment.canUseDOM) {
   // Targeted URL change detection for SPA routing
   const checkUrlChange = () => {
     if (location.href !== lastUrl) {
-      lastUrl = location.href;
-      handleRouteChange(); // Use fast route change handler
+      const currentPathname = location.pathname;
+      const lastPathname = new URL(lastUrl).pathname;
+      
+      // Only trigger route change for actual page changes, not hash/query changes
+      if (currentPathname !== lastPathname) {
+        lastUrl = location.href;
+        handleRouteChange(); // Use fast route change handler
+      } else {
+        // Just update the URL without triggering re-injection
+        lastUrl = location.href;
+      }
     }
   };
 
