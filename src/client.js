@@ -193,10 +193,7 @@ if (ExecutionEnvironment.canUseDOM) {
 
   // Reliable initialization for page refresh/initial load
   const initializeButton = () => {
-    if (isInitialized) {
-      return;
-    }
-    
+    // Reset initialization state to ensure button can be re-injected after refresh
     isInitialized = true;
     injectionAttempts = 0;
     
@@ -248,7 +245,7 @@ if (ExecutionEnvironment.canUseDOM) {
   // Periodic check - only for initial page load issues
   const startPeriodicCheck = () => {
     let recheckCount = 0;
-    const maxRechecks = 15; // 7.5 seconds total
+    const maxRechecks = 30; // 15 seconds total - increased for slower loading pages
     
     // Clear any existing interval
     if (recheckInterval) {
@@ -263,7 +260,7 @@ if (ExecutionEnvironment.canUseDOM) {
         document.querySelector('[class*="tableOfContents"]') ||
         document.querySelector('[class*="toc"]');
       
-      if (sidebar && !container) {
+      if (sidebar && (!container || !sidebar.contains(container))) {
         // Log only if we're having to retry (indicates potential issue)
         if (recheckCount > 3) {
           console.log('[Copy Button] Re-injecting after', recheckCount * 0.5, 'seconds');
@@ -286,6 +283,23 @@ if (ExecutionEnvironment.canUseDOM) {
   } else {
     setTimeout(initializeButton, 100);
   }
+
+  // Force re-injection on page visibility change (helps with tab switching and refreshes)
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      setTimeout(() => {
+        const container = document.getElementById("copy-page-button-container");
+        const sidebar = document.querySelector(".theme-doc-toc-desktop") ||
+          document.querySelector(".table-of-contents") ||
+          document.querySelector('[class*="tableOfContents"]') ||
+          document.querySelector('[class*="toc"]');
+        
+        if (sidebar && (!container || !sidebar.contains(container))) {
+          reliableInjectCopyPageButton();
+        }
+      }, 200);
+    }
+  });
 
   // Handle responsive layout changes
   window.addEventListener("resize", () => {
