@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
 import useIsBrowser from '@docusaurus/useIsBrowser';
 import styles from "./styles.module.css";
 
@@ -526,41 +525,38 @@ Please provide a clear summary and help me understand the key concepts covered i
         </button>
       </div>
 
-      {isOpen && isBrowser && (
-        createPortal(
-          <div
-            className={dropdownProps.className}
-            style={{
-              position: "fixed",
-              top: `${dropdownPosition.top}px`,
-              left: `${dropdownPosition.left}px`,
-              zIndex: 10000,
-              ...dropdownProps.style
-            }}
-            ref={dropdownRef}
-          >
-            {dropdownItems.map((item) => (
-              <button
-                key={item.id}
-                className={dropdownItemProps.className}
-                style={dropdownItemProps.style}
-                onClick={() => {
-                  item.action();
-                  setIsOpen(false);
-                }}
-              >
-                {item.icon}
-                <div>
-                  <div className={styles.itemTitle}>{item.title}</div>
-                  <div className={styles.itemDescription}>
-                    {item.description}
-                  </div>
+      {isOpen && (
+        <div
+          className={dropdownProps.className}
+          style={{
+            position: "fixed",
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            zIndex: 10000,
+            ...dropdownProps.style
+          }}
+          ref={dropdownRef}
+        >
+          {dropdownItems.map((item) => (
+            <button
+              key={item.id}
+              className={dropdownItemProps.className}
+              style={dropdownItemProps.style}
+              onClick={() => {
+                item.action();
+                setIsOpen(false);
+              }}
+            >
+              {item.icon}
+              <div>
+                <div className={styles.itemTitle}>{item.title}</div>
+                <div className={styles.itemDescription}>
+                  {item.description}
                 </div>
-              </button>
-            ))}
-          </div>,
-          document.body
-        )
+              </div>
+            </button>
+          ))}
+        </div>
       )}
     </>
   );
