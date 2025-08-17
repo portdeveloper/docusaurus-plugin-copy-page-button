@@ -1,6 +1,6 @@
 {
   "name": "docusaurus-plugin-copy-page-button",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A Docusaurus plugin that provides a copy page button for extracting content as markdown for LLMs",
   "main": "src/index.js",
   "keywords": [
@@ -23,7 +23,7 @@
   },
   "peerDependencies": {
     "@docusaurus/core": "^3.0.0",
-    "react": "^18.0.0"
+    "react": "^18.0.0 || ^19.0.0"
   },
   "engines": {
     "node": ">=18.0"
