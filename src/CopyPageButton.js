@@ -351,30 +351,48 @@ export default function CopyPageButton({ customStyles = {} }) {
 
   const copyToClipboard = async (text) => {
     try {
-      await navigator.clipboard.writeText(text);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        console.log('Content copied to clipboard successfully');
+      } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        console.log('Content copied to clipboard using fallback method');
+      }
     } catch (err) {
-      // Silently fail - clipboard API may not be available
+      console.error('Failed to copy to clipboard:', err);
     }
   };
 
   const openInAI = (baseUrl) => {
-    if (!isBrowser) return;
-    
-    const currentUrl = window.location.href;
-    const prompt = encodeURIComponent(
-      `Please read and explain this documentation page: ${currentUrl}
+    try {
+      const currentUrl = window.location.href;
+      const prompt = encodeURIComponent(
+        `Please read and explain this documentation page: ${currentUrl}
 
 Please provide a clear summary and help me understand the key concepts covered in this documentation.`
-    );
-    window.open(`${baseUrl}?q=${prompt}`, "_blank");
+      );
+      window.open(`${baseUrl}?q=${prompt}`, "_blank");
+      console.log('Opened AI tool with prompt');
+    } catch (err) {
+      console.error('Failed to open AI tool:', err);
+    }
   };
 
   const viewAsMarkdown = () => {
-    if (!isBrowser) return;
-    
-    const blob = new Blob([pageContent], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
+    try {
+      const blob = new Blob([pageContent], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+      console.log('Opened markdown view');
+    } catch (err) {
+      console.error('Failed to open markdown view:', err);
+    }
   };
 
   const dropdownItems = [
