@@ -3,14 +3,6 @@ const path = require("path");
 module.exports = function copyPageButtonPlugin(context, options = {}) {
   const { customStyles = {}, ...otherOptions } = options;
   
-  // Store options globally for client access
-  if (typeof global !== 'undefined') {
-    global.__COPY_PAGE_BUTTON_OPTIONS__ = {
-      customStyles,
-      ...otherOptions
-    };
-  }
-  
   return {
     name: "copy-page-button-plugin",
 

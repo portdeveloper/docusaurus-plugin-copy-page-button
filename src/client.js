@@ -7,7 +7,6 @@ import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 if (ExecutionEnvironment.canUseDOM) {
   let root = null;
   let lastUrl = location.href;
-  let isInitialized = false;
   let recheckInterval = null;
   let injectionAttempts = 0;
 
@@ -193,8 +192,7 @@ if (ExecutionEnvironment.canUseDOM) {
 
   // Reliable initialization for page refresh/initial load
   const initializeButton = () => {
-    // Reset initialization state to ensure button can be re-injected after refresh
-    isInitialized = true;
+    // Reset injection attempts to ensure button can be re-injected after refresh
     injectionAttempts = 0;
     
     // Multi-strategy initialization for page refresh

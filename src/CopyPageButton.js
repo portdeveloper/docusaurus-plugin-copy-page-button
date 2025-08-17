@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import useIsBrowser from '@docusaurus/useIsBrowser';
 import styles from "./styles.module.css";
 
 // Static selectors for content cleanup
@@ -54,7 +53,6 @@ export default function CopyPageButton({ customStyles = {} }) {
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
-  const isBrowser = useIsBrowser();
 
   // Extract custom style configurations
   const containerStyleConfig = customStyles.container || {};
