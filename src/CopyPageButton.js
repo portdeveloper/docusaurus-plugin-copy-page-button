@@ -94,36 +94,13 @@ export default function CopyPageButton({ customStyles = {} }) {
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isBrowser) return;
+    if (typeof window === 'undefined') return;
     
-    const extractPageContent = () => {
-      const mainContent =
-        document.querySelector("main article") ||
-        document.querySelector("main .markdown");
-
-      if (!mainContent) return;
-
-      const clone = mainContent.cloneNode(true);
-
-      // Remove unwanted elements
-      SELECTORS_TO_REMOVE.forEach((selector) => {
-        clone.querySelectorAll(selector).forEach((el) => el.remove());
-      });
-
-      // Extract title from first H1 and remove it from content
-      const firstH1 = clone.querySelector("h1");
-      const title = firstH1?.textContent.trim() || "Documentation Page";
-      if (firstH1) {
-        firstH1.remove();
-      }
-
-      const content = convertToMarkdown(clone);
-      const currentUrl = window.location.href;
-      setPageContent(`# ${title}\n\nURL: ${currentUrl}\n\n${content}`);
-    };
-
-    extractPageContent();
-  }, [isBrowser]);
+    const content = extractPageContent();
+    if (content) {
+      setPageContent(content);
+    }
+  }, []);
 
   const convertToMarkdown = (element) => {
     const cleanText = (text) => {
@@ -349,7 +326,65 @@ export default function CopyPageButton({ customStyles = {} }) {
       .trim();
   };
 
+  const extractPageContent = () => {
+    console.log('Extracting page content...');
+    
+    const mainContent =
+      document.querySelector("main article") ||
+      document.querySelector("main .markdown");
+
+    console.log('Found main content element:', !!mainContent);
+    if (!mainContent) {
+      console.error('No main content found - looking for alternative selectors');
+      // Try alternative selectors
+      const alternatives = document.querySelector("main") || document.querySelector("article") || document.querySelector(".main-wrapper");
+      console.log('Alternative content element found:', !!alternatives);
+      if (!alternatives) return "";
+    }
+
+    const targetElement = mainContent || document.querySelector("main") || document.querySelector("article");
+    const clone = targetElement.cloneNode(true);
+
+    // Remove unwanted elements
+    SELECTORS_TO_REMOVE.forEach((selector) => {
+      clone.querySelectorAll(selector).forEach((el) => el.remove());
+    });
+
+    // Extract title from first H1 and remove it from content
+    const firstH1 = clone.querySelector("h1");
+    const title = firstH1?.textContent.trim() || "Documentation Page";
+    console.log('Extracted title:', title);
+    if (firstH1) {
+      firstH1.remove();
+    }
+
+    const content = convertToMarkdown(clone);
+    console.log('Converted content length:', content.length);
+    console.log('Content preview:', content.substring(0, 200));
+    
+    const currentUrl = window.location.href;
+    const finalContent = `# ${title}\n\nURL: ${currentUrl}\n\n${content}`;
+    console.log('Final page content set with length:', finalContent.length);
+    return finalContent;
+  };
+
   const copyToClipboard = async (text) => {
+    console.log('copyToClipboard called with text length:', text?.length);
+    console.log('Text content preview:', text?.substring(0, 100));
+    
+    // If no content, try to extract it now
+    if (!text || text.trim() === '') {
+      console.log('No pageContent available, extracting now...');
+      const extractedContent = extractPageContent();
+      if (extractedContent) {
+        setPageContent(extractedContent);
+        text = extractedContent;
+      } else {
+        console.error('Failed to extract content');
+        return;
+      }
+    }
+    
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(text);
@@ -385,8 +420,26 @@ Please provide a clear summary and help me understand the key concepts covered i
   };
 
   const viewAsMarkdown = () => {
+    console.log('viewAsMarkdown called with pageContent length:', pageContent?.length);
+    console.log('PageContent preview:', pageContent?.substring(0, 100));
+    
+    let contentToView = pageContent;
+    
+    // If no content, try to extract it now
+    if (!contentToView || contentToView.trim() === '') {
+      console.log('No pageContent available, extracting now...');
+      const extractedContent = extractPageContent();
+      if (extractedContent) {
+        setPageContent(extractedContent);
+        contentToView = extractedContent;
+      } else {
+        console.error('Failed to extract content');
+        return;
+      }
+    }
+    
     try {
-      const blob = new Blob([pageContent], { type: "text/plain" });
+      const blob = new Blob([contentToView], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
       console.log('Opened markdown view');
