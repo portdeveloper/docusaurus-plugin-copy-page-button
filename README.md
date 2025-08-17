@@ -1,8 +1,20 @@
 # Docusaurus Copy Page Button Plugin
 
+[![npm version](https://badge.fury.io/js/docusaurus-plugin-copy-page-button.svg)](https://www.npmjs.com/package/docusaurus-plugin-copy-page-button)
+[![npm downloads](https://img.shields.io/npm/dm/docusaurus-plugin-copy-page-button.svg)](https://www.npmjs.com/package/docusaurus-plugin-copy-page-button)
+
 <img src="https://github.com/user-attachments/assets/2b91c2c9-97e7-4854-82dd-e1b6caa6511e" alt="Docusaurus Copy Page Button Plugin Preview" width="449" height="392" />
 
-A lightweight Docusaurus plugin that adds a "Copy page" button to your documentation site, making it easy for users to extract page content as markdown for use with LLMs and AI tools.
+**Extract Docusaurus documentation content as markdown for AI tools like ChatGPT and Claude**
+
+A lightweight Docusaurus plugin that automatically adds a "Copy page" button to your documentation site's sidebar. Perfect for developers who want to quickly extract documentation content for AI assistance, code reviews, or content analysis.
+
+## Why Use This Plugin?
+
+- **AI-Ready Content**: Instantly convert documentation pages to clean markdown for ChatGPT, Claude, or other AI tools
+- **Developer Productivity**: Copy entire documentation pages without manual selection and cleanup
+- **Zero Configuration**: Works out of the box - just install and go
+- **Documentation Workflow**: Streamline the process of getting documentation context for AI assistance
 
 ## Features
 
@@ -219,11 +231,33 @@ The locally linked plugin will now be active in your Docusaurus site. Any change
 
 The plugin intelligently extracts page content by:
 
-1. Selecting the main content area
-2. Removing navigation, sidebars, and UI elements
-3. Cleaning up admonition blocks (`:::` → spaces)
-4. Formatting as clean markdown with title and URL
+1. **Smart Content Selection**: Automatically identifies the main documentation content area
+2. **Clean Extraction**: Removes navigation, sidebars, headers, footers, and UI elements
+3. **Markdown Conversion**: Converts HTML to properly formatted markdown with preserved structure
+4. **AI-Optimized Format**: Includes page title, URL, and clean content perfect for AI tool input
+
+## Use Cases
+
+- **AI-Assisted Development**: Quickly share documentation context with ChatGPT or Claude for coding help
+- **Code Reviews**: Extract relevant documentation for code review discussions
+- **Content Analysis**: Analyze documentation structure and content for improvements
+- **Knowledge Sharing**: Easily share specific documentation sections with team members
+- **Documentation Migration**: Extract content for migrating to other documentation platforms
+
+## SEO Keywords
+
+Docusaurus plugin, copy page button, extract documentation, markdown conversion, AI tools integration, ChatGPT documentation, Claude AI, content extraction, developer tools, documentation productivity, React plugin, JavaScript documentation tools.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## Support
+
+- 🐛 [Report Issues](https://github.com/portdeveloper/docusaurus-plugin-copy-page-button/issues)
+- 💡 [Request Features](https://github.com/portdeveloper/docusaurus-plugin-copy-page-button/issues/new)
+- 📖 [Documentation](https://github.com/portdeveloper/docusaurus-plugin-copy-page-button#readme)
 
 ## License
 
-MIT
+MIT © [portdeveloper](https://github.com/portdeveloper)
