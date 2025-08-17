@@ -7,9 +7,9 @@ A lightweight Docusaurus plugin that adds a "Copy page" button to your documenta
 ## Features
 
 - 📋 **Copy page as markdown** - Clean page content extraction
-- 👁️ **View as markdown** - Preview extracted content in modal
+- 👁️ **View as markdown** - Preview extracted content in new tab
 - 🤖 **AI integration** - Direct "Open in ChatGPT" and "Open in Claude" buttons
-- ⚡ **Auto-injection** - Automatically adds to navbar (no configuration needed)
+- ⚡ **Auto-injection** - Automatically adds to table of contents sidebar (no configuration needed)
 - 🎨 **Theme-aware** - Supports light/dark themes
 - 🎨 **Customizable styling** - Easy custom CSS classes and inline styles
 - 📱 **Mobile-friendly** - Responsive design
@@ -33,17 +33,31 @@ module.exports = {
 };
 ```
 
-The button will automatically appear in your navbar!
+The button will automatically appear in your table of contents sidebar!
 
-### Option 2: Manual component usage
+### Option 2: Custom positioning
 
-Import and use the component manually:
+Use custom styles to position the button differently:
 
-```jsx
-import CopyPageButton from "docusaurus-plugin-copy-page-button";
-
-// In your custom navbar or anywhere else
-<CopyPageButton />
+```js
+module.exports = {
+  plugins: [
+    [
+      "docusaurus-plugin-copy-page-button",
+      {
+        customStyles: {
+          button: {
+            style: {
+              position: "fixed",
+              top: "20px",
+              right: "20px",
+            },
+          },
+        },
+      },
+    ],
+  ],
+};
 ```
 
 ## Configuration
