@@ -1,6 +1,6 @@
 {
   "name": "docusaurus-plugin-copy-page-button",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Docusaurus plugin that adds a copy page button to extract documentation content as markdown for AI tools like ChatGPT and Claude",
   "main": "src/index.js",
   "keywords": [
