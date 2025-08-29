@@ -14,6 +14,73 @@ if (ExecutionEnvironment.canUseDOM) {
     return (typeof window !== "undefined" && window.__COPY_PAGE_BUTTON_OPTIONS__) || {};
   };
 
+  // Fallback injection for pages without TOC
+  const injectToFallbackLocation = () => {
+    // Look for main article content area
+    const articleContent = 
+      document.querySelector("article") ||
+      document.querySelector(".markdown") ||
+      document.querySelector('[class*="docItemContainer"]') ||
+      document.querySelector('.theme-doc-markdown') ||
+      document.querySelector('main');
+
+    if (!articleContent) {
+      return; // No suitable container found
+    }
+
+    let container = document.getElementById("copy-page-button-container");
+    if (container && articleContent.contains(container)) {
+      return; // Already properly attached
+    }
+
+    if (container) {
+      cleanup();
+    }
+
+    container = document.createElement("div");
+    container.id = "copy-page-button-container";
+
+    // Apply custom positioning styles to the container if provided
+    const pluginOptions = getPluginOptions();
+    const customStyles = pluginOptions.customStyles || {};
+    const buttonStyles = customStyles.button?.style || {};
+    
+    // Check if button config has positioning styles that should be applied to container
+    const positioningProps = ['position', 'top', 'right', 'bottom', 'left', 'zIndex', 'transform'];
+    positioningProps.forEach(prop => {
+      if (buttonStyles[prop] !== undefined) {
+        container.style[prop] = buttonStyles[prop];
+      }
+    });
+    
+    // For fallback injection, use fixed positioning in top-right of viewport if no custom positioning
+    const hasCustomPositioning = positioningProps.some(prop => buttonStyles[prop] !== undefined);
+    if (!hasCustomPositioning) {
+      container.style.position = 'fixed';
+      container.style.top = '80px';
+      container.style.right = '20px';
+      container.style.zIndex = '1000';
+    }
+    
+    // Also apply container-specific styles
+    const containerStyles = customStyles.container?.style || {};
+    Object.assign(container.style, containerStyles);
+
+    articleContent.insertBefore(container, articleContent.firstChild);
+
+    if (root) {
+      try {
+        root.unmount();
+      } catch (e) {
+        // Silent cleanup
+      }
+    }
+    root = createRoot(container);
+    
+    const renderOptions = getPluginOptions();
+    root.render(React.createElement(CopyPageButton, { customStyles: renderOptions.customStyles }));
+  };
+
   // Fast injection for navigation (when sidebar already exists)
   const fastInjectCopyPageButton = () => {
     const sidebar =
@@ -23,8 +90,8 @@ if (ExecutionEnvironment.canUseDOM) {
       document.querySelector('[class*="toc"]');
 
     if (!sidebar) {
-      // If no sidebar, fallback to slow reliable method
-      reliableInjectCopyPageButton();
+      // If no sidebar, try fallback injection to main content area
+      injectToFallbackLocation();
       return;
     }
 
@@ -83,7 +150,19 @@ if (ExecutionEnvironment.canUseDOM) {
       document.querySelector('[class*="toc"]');
 
     if (!sidebar) {
-      if (injectionAttempts < 30) { // Try for 3 seconds max
+      // Try fallback injection to main content area
+      const articleContent = 
+        document.querySelector("article") ||
+        document.querySelector(".markdown") ||
+        document.querySelector('[class*="docItemContainer"]') ||
+        document.querySelector('.theme-doc-markdown') ||
+        document.querySelector('main');
+        
+      if (articleContent) {
+        injectToFallbackLocation();
+        injectionAttempts = 0; // Reset counter on success
+        return;
+      } else if (injectionAttempts < 30) { // Try for 3 seconds max
         setTimeout(reliableInjectCopyPageButton, 100);
       }
       return;
@@ -167,7 +246,18 @@ if (ExecutionEnvironment.canUseDOM) {
       document.querySelector('[class*="tableOfContents"]') ||
       document.querySelector('[class*="toc"]');
     
-    const buttonProperlyAttached = container && sidebar && sidebar.contains(container);
+    // Check if button is attached to sidebar or fallback location
+    const articleContent = 
+      document.querySelector("article") ||
+      document.querySelector(".markdown") ||
+      document.querySelector('[class*="docItemContainer"]') ||
+      document.querySelector('.theme-doc-markdown') ||
+      document.querySelector('main');
+    
+    const buttonProperlyAttached = container && (
+      (sidebar && sidebar.contains(container)) ||
+      (articleContent && articleContent.contains(container))
+    );
     
     // Only cleanup and re-inject if button is not properly attached
     if (!buttonProperlyAttached) {
@@ -203,8 +293,15 @@ if (ExecutionEnvironment.canUseDOM) {
         document.querySelector('[class*="tableOfContents"]') ||
         document.querySelector('[class*="toc"]');
         
-      if (sidebar) {
-        // Sidebar found - inject with reasonable delay
+      const articleContent = 
+        document.querySelector("article") ||
+        document.querySelector(".markdown") ||
+        document.querySelector('[class*="docItemContainer"]') ||
+        document.querySelector('.theme-doc-markdown') ||
+        document.querySelector('main');
+        
+      if (sidebar || articleContent) {
+        // Suitable container found - inject with reasonable delay
         setTimeout(reliableInjectCopyPageButton, 100);
       } else {
         // Strategy 2: Wait for Docusaurus to fully load
@@ -258,7 +355,18 @@ if (ExecutionEnvironment.canUseDOM) {
         document.querySelector('[class*="tableOfContents"]') ||
         document.querySelector('[class*="toc"]');
       
-      if (sidebar && (!container || !sidebar.contains(container))) {
+      const articleContent = 
+        document.querySelector("article") ||
+        document.querySelector(".markdown") ||
+        document.querySelector('[class*="docItemContainer"]') ||
+        document.querySelector('.theme-doc-markdown') ||
+        document.querySelector('main');
+      
+      const needsInjection = (sidebar || articleContent) && (!container || 
+        (!sidebar || !sidebar.contains(container)) && 
+        (!articleContent || !articleContent.contains(container)));
+      
+      if (needsInjection) {
         // Log only if we're having to retry (indicates potential issue)
         if (recheckCount > 3) {
           console.log('[Copy Button] Re-injecting after', recheckCount * 0.5, 'seconds');
@@ -266,7 +374,12 @@ if (ExecutionEnvironment.canUseDOM) {
         reliableInjectCopyPageButton();
       }
       
-      if (recheckCount >= maxRechecks || (container && sidebar && sidebar.contains(container))) {
+      const buttonProperlyAttached = container && (
+        (sidebar && sidebar.contains(container)) ||
+        (articleContent && articleContent.contains(container))
+      );
+      
+      if (recheckCount >= maxRechecks || buttonProperlyAttached) {
         clearInterval(recheckInterval);
         recheckInterval = null;
       }
@@ -292,7 +405,18 @@ if (ExecutionEnvironment.canUseDOM) {
           document.querySelector('[class*="tableOfContents"]') ||
           document.querySelector('[class*="toc"]');
         
-        if (sidebar && (!container || !sidebar.contains(container))) {
+        const articleContent = 
+          document.querySelector("article") ||
+          document.querySelector(".markdown") ||
+          document.querySelector('[class*="docItemContainer"]') ||
+          document.querySelector('.theme-doc-markdown') ||
+          document.querySelector('main');
+        
+        const needsInjection = (sidebar || articleContent) && (!container || 
+          (!sidebar || !sidebar.contains(container)) && 
+          (!articleContent || !articleContent.contains(container)));
+        
+        if (needsInjection) {
           reliableInjectCopyPageButton();
         }
       }, 200);
@@ -309,19 +433,28 @@ if (ExecutionEnvironment.canUseDOM) {
         document.querySelector('[class*="tableOfContents"]') ||
         document.querySelector('[class*="toc"]');
 
+      const articleContent = 
+        document.querySelector("article") ||
+        document.querySelector(".markdown") ||
+        document.querySelector('[class*="docItemContainer"]') ||
+        document.querySelector('.theme-doc-markdown') ||
+        document.querySelector('main');
+
       const sidebarVisible =
         sidebar &&
         sidebar.offsetWidth > 0 &&
         sidebar.offsetHeight > 0 &&
         window.getComputedStyle(sidebar).display !== "none";
 
-      const buttonProperlyAttached =
-        container && sidebar && sidebar.contains(container);
+      const buttonProperlyAttached = container && (
+        (sidebar && sidebar.contains(container)) ||
+        (articleContent && articleContent.contains(container))
+      );
 
-      if (sidebarVisible && !buttonProperlyAttached) {
+      if ((sidebarVisible || articleContent) && !buttonProperlyAttached) {
         cleanup();
         fastInjectCopyPageButton(); // Use fast injection for resize
-      } else if (!sidebarVisible && buttonProperlyAttached) {
+      } else if (!sidebarVisible && !articleContent && buttonProperlyAttached) {
         cleanup();
       }
     }, 300);
