@@ -450,7 +450,7 @@ Please provide a clear summary and help me understand the key concepts covered i
     {
       id: "copy",
       title: "Copy page",
-      description: "Copy the page as MarkDown for LLMs",
+      description: "Copy the page as Markdown for LLMs",
       icon: (
         <svg
           width="16"
@@ -468,7 +468,7 @@ Please provide a clear summary and help me understand the key concepts covered i
     },
     {
       id: "view",
-      title: "View as MarkDown",
+      title: "View as Markdown",
       description: "View this page as plain text",
       icon: (
         <svg
