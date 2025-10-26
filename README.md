@@ -258,6 +258,10 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 - 💡 [Request Features](https://github.com/portdeveloper/docusaurus-plugin-copy-page-button/issues/new)
 - 📖 [Documentation](https://github.com/portdeveloper/docusaurus-plugin-copy-page-button#readme)
 
+## Reach out to me for faster replies!
+
+My telegram username is portdev, feel free to dm me whenever (and bug me if I don't reply)
+
 ## License
 
 MIT © [portdeveloper](https://github.com/portdeveloper)
