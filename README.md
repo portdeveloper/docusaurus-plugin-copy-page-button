@@ -21,6 +21,7 @@ A lightweight Docusaurus plugin that automatically adds a "Copy page" button to 
 - 📋 **Copy page as markdown** - Clean page content extraction
 - 👁️ **View as markdown** - Preview extracted content in new tab
 - 🤖 **AI integration** - Direct "Open in ChatGPT" and "Open in Claude" buttons
+- ⚙️ **Configurable actions** - Show/hide specific dropdown actions (perfect for private sites)
 - ⚡ **Auto-injection** - Automatically adds to table of contents sidebar (no configuration needed)
 - 🎨 **Theme-aware** - Supports light/dark themes
 - 🎨 **Customizable styling** - Easy custom CSS classes and inline styles
@@ -73,6 +74,45 @@ module.exports = {
 ```
 
 ## Configuration
+
+### Enabled Actions
+
+You can control which actions appear in the dropdown menu using the `enabledActions` option. This is particularly useful for private documentation sites where the AI tool links (ChatGPT/Claude) won't work properly.
+
+```js
+module.exports = {
+  plugins: [
+    [
+      "docusaurus-plugin-copy-page-button",
+      {
+        // Only show copy and view actions (hide ChatGPT and Claude)
+        enabledActions: ['copy', 'view'],
+      },
+    ],
+  ],
+};
+```
+
+**Available actions:**
+- `'copy'` - Copy page as Markdown
+- `'view'` - View as Markdown in new tab
+- `'chatgpt'` - Open in ChatGPT
+- `'claude'` - Open in Claude
+
+**Default:** All actions are enabled: `['copy', 'view', 'chatgpt', 'claude']`
+
+**Example configurations:**
+
+```js
+// Only copy functionality
+enabledActions: ['copy']
+
+// Copy and view only (no AI tools)
+enabledActions: ['copy', 'view']
+
+// All actions including AI tools (default)
+enabledActions: ['copy', 'view', 'chatgpt', 'claude']
+```
 
 ### Custom Styling
 

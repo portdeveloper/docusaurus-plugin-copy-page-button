@@ -47,7 +47,10 @@ const separatePositioningStyles = (styleObject = {}) => {
   return { positioning, nonPositioning };
 };
 
-export default function CopyPageButton({ customStyles = {} }) {
+export default function CopyPageButton({
+  customStyles = {},
+  enabledActions = ['copy', 'view', 'chatgpt', 'claude']
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [pageContent, setPageContent] = useState("");
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
@@ -446,7 +449,7 @@ Please provide a clear summary and help me understand the key concepts covered i
     }
   };
 
-  const dropdownItems = [
+  const allDropdownItems = [
     {
       id: "copy",
       title: "Copy page",
@@ -527,6 +530,11 @@ Please provide a clear summary and help me understand the key concepts covered i
       action: () => openInAI("https://claude.ai/new"),
     },
   ];
+
+  // Filter dropdown items based on enabled actions
+  const dropdownItems = allDropdownItems.filter(item =>
+    enabledActions.includes(item.id)
+  );
 
   // Handle positioning styles - if button config has positioning, move it to container
   const { positioning: buttonPositioning, nonPositioning: buttonNonPositioning } = 

@@ -76,9 +76,12 @@ if (ExecutionEnvironment.canUseDOM) {
       }
     }
     root = createRoot(container);
-    
+
     const renderOptions = getPluginOptions();
-    root.render(React.createElement(CopyPageButton, { customStyles: renderOptions.customStyles }));
+    root.render(React.createElement(CopyPageButton, {
+      customStyles: renderOptions.customStyles,
+      enabledActions: renderOptions.enabledActions
+    }));
   };
 
   // Fast injection for navigation (when sidebar already exists)
@@ -134,9 +137,12 @@ if (ExecutionEnvironment.canUseDOM) {
       }
     }
     root = createRoot(container);
-    
+
     const renderOptions = getPluginOptions();
-    root.render(React.createElement(CopyPageButton, { customStyles: renderOptions.customStyles }));
+    root.render(React.createElement(CopyPageButton, {
+      customStyles: renderOptions.customStyles,
+      enabledActions: renderOptions.enabledActions
+    }));
   };
 
   // Reliable injection for page refresh/initial load (when DOM might not be ready)
@@ -208,10 +214,13 @@ if (ExecutionEnvironment.canUseDOM) {
       }
     }
     root = createRoot(container);
-    
+
     const renderOptions = getPluginOptions();
-    root.render(React.createElement(CopyPageButton, { customStyles: renderOptions.customStyles }));
-    
+    root.render(React.createElement(CopyPageButton, {
+      customStyles: renderOptions.customStyles,
+      enabledActions: renderOptions.enabledActions
+    }));
+
     // Reset injection attempts on successful injection
     injectionAttempts = 0;
     

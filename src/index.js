@@ -1,8 +1,12 @@
 const path = require("path");
 
 module.exports = function copyPageButtonPlugin(context, options = {}) {
-  const { customStyles = {}, ...otherOptions } = options;
-  
+  const {
+    customStyles = {},
+    enabledActions = ['copy', 'view', 'chatgpt', 'claude'],
+    ...otherOptions
+  } = options;
+
   return {
     name: "copy-page-button-plugin",
 
@@ -18,6 +22,7 @@ module.exports = function copyPageButtonPlugin(context, options = {}) {
             innerHTML: `
               window.__COPY_PAGE_BUTTON_OPTIONS__ = ${JSON.stringify({
                 customStyles,
+                enabledActions,
                 ...otherOptions
               })};
             `
