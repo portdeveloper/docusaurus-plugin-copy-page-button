@@ -4,7 +4,9 @@
 [![npm downloads](https://img.shields.io/npm/dm/docusaurus-plugin-copy-page-button.svg)](https://www.npmjs.com/package/docusaurus-plugin-copy-page-button)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<img src="https://github.com/user-attachments/assets/2b91c2c9-97e7-4854-82dd-e1b6caa6511e" alt="Docusaurus Copy Page Button Plugin Preview" width="449" height="392" />
+**[Live Demo](https://portdeveloper.github.io/copy-page-button-showcase/)**
+
+<img src="https://github.com/user-attachments/assets/8e7351ba-0cab-489c-bbcf-543603c3bcf1" alt="Docusaurus Copy Page Button Plugin Preview" width="418" height="448" />
 
 **Extract Docusaurus documentation content as markdown for AI tools like ChatGPT, Claude, and Gemini**
 
