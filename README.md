@@ -88,7 +88,7 @@ module.exports = {
     [
       "docusaurus-plugin-copy-page-button",
       {
-        // Only show copy and view actions (hide ChatGPT and Claude)
+        // Only show copy and view actions (hide AI tools)
         enabledActions: ['copy', 'view'],
       },
     ],

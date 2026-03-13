@@ -376,10 +376,6 @@ if (ExecutionEnvironment.canUseDOM) {
         (!articleContent || !articleContent.contains(container)));
       
       if (needsInjection) {
-        // Log only if we're having to retry (indicates potential issue)
-        if (recheckCount > 3) {
-          console.log('[Copy Button] Re-injecting after', recheckCount * 0.5, 'seconds');
-        }
         reliableInjectCopyPageButton();
       }
       

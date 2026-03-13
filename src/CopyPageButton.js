@@ -328,18 +328,12 @@ export default function CopyPageButton({
   };
 
   const extractPageContent = () => {
-    console.log('Extracting page content...');
-    
     const mainContent =
       document.querySelector("main article") ||
       document.querySelector("main .markdown");
 
-    console.log('Found main content element:', !!mainContent);
     if (!mainContent) {
-      console.error('No main content found - looking for alternative selectors');
-      // Try alternative selectors
       const alternatives = document.querySelector("main") || document.querySelector("article") || document.querySelector(".main-wrapper");
-      console.log('Alternative content element found:', !!alternatives);
       if (!alternatives) return "";
     }
 
@@ -354,42 +348,30 @@ export default function CopyPageButton({
     // Extract title from first H1 and remove it from content
     const firstH1 = clone.querySelector("h1");
     const title = firstH1?.textContent.trim() || "Documentation Page";
-    console.log('Extracted title:', title);
     if (firstH1) {
       firstH1.remove();
     }
 
     const content = convertToMarkdown(clone);
-    console.log('Converted content length:', content.length);
-    console.log('Content preview:', content.substring(0, 200));
-    
     const currentUrl = window.location.href;
-    const finalContent = `# ${title}\n\nURL: ${currentUrl}\n\n${content}`;
-    console.log('Final page content set with length:', finalContent.length);
-    return finalContent;
+    return `# ${title}\n\nURL: ${currentUrl}\n\n${content}`;
   };
 
   const copyToClipboard = async (text) => {
-    console.log('copyToClipboard called with text length:', text?.length);
-    console.log('Text content preview:', text?.substring(0, 100));
-    
     // If no content, try to extract it now
     if (!text || text.trim() === '') {
-      console.log('No pageContent available, extracting now...');
       const extractedContent = extractPageContent();
       if (extractedContent) {
         setPageContent(extractedContent);
         text = extractedContent;
       } else {
-        console.error('Failed to extract content');
         return;
       }
     }
-    
+
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(text);
-        console.log('Content copied to clipboard successfully');
       } else {
         // Fallback for older browsers
         const textArea = document.createElement('textarea');
@@ -398,10 +380,9 @@ export default function CopyPageButton({
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        console.log('Content copied to clipboard using fallback method');
       }
     } catch (err) {
-      console.error('Failed to copy to clipboard:', err);
+      // Silently fail
     }
   };
 
@@ -414,38 +395,31 @@ export default function CopyPageButton({
 Please provide a clear summary and help me understand the key concepts covered in this documentation.`
       );
       window.open(`${baseUrl}?${queryParam}=${prompt}`, "_blank");
-      console.log('Opened AI tool with prompt');
     } catch (err) {
-      console.error('Failed to open AI tool:', err);
+      // Silently fail
     }
   };
 
   const viewAsMarkdown = () => {
-    console.log('viewAsMarkdown called with pageContent length:', pageContent?.length);
-    console.log('PageContent preview:', pageContent?.substring(0, 100));
-    
     let contentToView = pageContent;
-    
+
     // If no content, try to extract it now
     if (!contentToView || contentToView.trim() === '') {
-      console.log('No pageContent available, extracting now...');
       const extractedContent = extractPageContent();
       if (extractedContent) {
         setPageContent(extractedContent);
         contentToView = extractedContent;
       } else {
-        console.error('Failed to extract content');
         return;
       }
     }
-    
+
     try {
       const blob = new Blob([contentToView], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
-      console.log('Opened markdown view');
     } catch (err) {
-      console.error('Failed to open markdown view:', err);
+      // Silently fail
     }
   };
 
