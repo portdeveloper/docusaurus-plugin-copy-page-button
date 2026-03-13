@@ -6,7 +6,7 @@
 
 <img src="https://github.com/user-attachments/assets/2b91c2c9-97e7-4854-82dd-e1b6caa6511e" alt="Docusaurus Copy Page Button Plugin Preview" width="449" height="392" />
 
-**Extract Docusaurus documentation content as markdown for AI tools like ChatGPT and Claude**
+**Extract Docusaurus documentation content as markdown for AI tools like ChatGPT, Claude, and Gemini**
 
 A lightweight Docusaurus plugin that automatically adds a "Copy page" button to your documentation site's sidebar. Perfect for developers who want to quickly extract documentation content for AI assistance, code reviews, or content analysis.
 
@@ -21,7 +21,7 @@ A lightweight Docusaurus plugin that automatically adds a "Copy page" button to 
 
 - 📋 **Copy page as markdown** - Clean page content extraction
 - 👁️ **View as markdown** - Preview extracted content in new tab
-- 🤖 **AI integration** - Direct "Open in ChatGPT" and "Open in Claude" buttons
+- 🤖 **AI integration** - Direct "Open in ChatGPT", "Open in Claude", and "Open in Gemini" buttons
 - ⚙️ **Configurable actions** - Show/hide specific dropdown actions (perfect for private sites)
 - ⚡ **Auto-injection** - Automatically adds to table of contents sidebar (no configuration needed)
 - 🎨 **Theme-aware** - Supports light/dark themes
@@ -78,7 +78,7 @@ module.exports = {
 
 ### Enabled Actions
 
-You can control which actions appear in the dropdown menu using the `enabledActions` option. This is particularly useful for private documentation sites where the AI tool links (ChatGPT/Claude) won't work properly.
+You can control which actions appear in the dropdown menu using the `enabledActions` option. This is particularly useful for private documentation sites where the AI tool links (ChatGPT/Claude/Gemini) won't work properly.
 
 ```js
 module.exports = {
@@ -99,8 +99,9 @@ module.exports = {
 - `'view'` - View as Markdown in new tab
 - `'chatgpt'` - Open in ChatGPT
 - `'claude'` - Open in Claude
+- `'gemini'` - Open in Gemini
 
-**Default:** All actions are enabled: `['copy', 'view', 'chatgpt', 'claude']`
+**Default:** All actions are enabled: `['copy', 'view', 'chatgpt', 'claude', 'gemini']`
 
 **Example configurations:**
 
@@ -112,7 +113,7 @@ enabledActions: ['copy']
 enabledActions: ['copy', 'view']
 
 // All actions including AI tools (default)
-enabledActions: ['copy', 'view', 'chatgpt', 'claude']
+enabledActions: ['copy', 'view', 'chatgpt', 'claude', 'gemini']
 ```
 
 ### Custom Styling
@@ -279,7 +280,7 @@ The plugin intelligently extracts page content by:
 
 ## Use Cases
 
-- **AI-Assisted Development**: Quickly share documentation context with ChatGPT or Claude for coding help
+- **AI-Assisted Development**: Quickly share documentation context with ChatGPT, Claude, or Gemini for coding help
 - **Code Reviews**: Extract relevant documentation for code review discussions
 - **Content Analysis**: Analyze documentation structure and content for improvements
 - **Knowledge Sharing**: Easily share specific documentation sections with team members
@@ -287,7 +288,7 @@ The plugin intelligently extracts page content by:
 
 ## SEO Keywords
 
-Docusaurus plugin, copy page button, extract documentation, markdown conversion, AI tools integration, ChatGPT documentation, Claude AI, content extraction, developer tools, documentation productivity, React plugin, JavaScript documentation tools.
+Docusaurus plugin, copy page button, extract documentation, markdown conversion, AI tools integration, ChatGPT documentation, Claude AI, Gemini AI, content extraction, developer tools, documentation productivity, React plugin, JavaScript documentation tools.
 
 ## Contributing
 

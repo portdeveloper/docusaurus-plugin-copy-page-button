@@ -49,7 +49,7 @@ const separatePositioningStyles = (styleObject = {}) => {
 
 export default function CopyPageButton({
   customStyles = {},
-  enabledActions = ['copy', 'view', 'chatgpt', 'claude']
+  enabledActions = ['copy', 'view', 'chatgpt', 'claude', 'gemini']
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [pageContent, setPageContent] = useState("");
@@ -405,7 +405,7 @@ export default function CopyPageButton({
     }
   };
 
-  const openInAI = (baseUrl) => {
+  const openInAI = (baseUrl, queryParam = 'q') => {
     try {
       const currentUrl = window.location.href;
       const prompt = encodeURIComponent(
@@ -413,7 +413,7 @@ export default function CopyPageButton({
 
 Please provide a clear summary and help me understand the key concepts covered in this documentation.`
       );
-      window.open(`${baseUrl}?q=${prompt}`, "_blank");
+      window.open(`${baseUrl}?${queryParam}=${prompt}`, "_blank");
       console.log('Opened AI tool with prompt');
     } catch (err) {
       console.error('Failed to open AI tool:', err);
@@ -528,6 +528,26 @@ Please provide a clear summary and help me understand the key concepts covered i
         </svg>
       ),
       action: () => openInAI("https://claude.ai/new"),
+    },
+    {
+      id: "gemini",
+      title: "Open in Gemini",
+      description: "Ask questions about this page",
+      icon: (
+        <svg
+          width="16"
+          height="16"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M16 8.016A8.522 8.522 0 008.016 16h-.032A8.521 8.521 0 000 8.016v-.032A8.521 8.521 0 007.984 0h.032A8.522 8.522 0 0016 7.984v.032z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+      action: () => openInAI("https://gemini.google.com/guided-learning", "query"),
     },
   ];
 
