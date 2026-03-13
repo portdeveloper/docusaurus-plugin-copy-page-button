@@ -3,7 +3,7 @@ const path = require("path");
 module.exports = function copyPageButtonPlugin(context, options = {}) {
   const {
     customStyles = {},
-    enabledActions = ['copy', 'view', 'chatgpt', 'claude'],
+    enabledActions = ['copy', 'view', 'chatgpt', 'claude', 'gemini'],
     ...otherOptions
   } = options;
 
