@@ -3,7 +3,8 @@ const path = require("path");
 module.exports = function copyPageButtonPlugin(context, options = {}) {
   const {
     customStyles = {},
-    enabledActions = ['copy', 'view', 'chatgpt', 'claude', 'gemini'],
+    enabledActions = ['copy', 'view', 'chatgpt', 'claude', 'perplexity', 'gemini', 'mcp-copy', 'mcp-cursor', 'mcp-vscode'],
+    mcpServer = null,
     ...otherOptions
   } = options;
 
@@ -23,6 +24,7 @@ module.exports = function copyPageButtonPlugin(context, options = {}) {
               window.__COPY_PAGE_BUTTON_OPTIONS__ = ${JSON.stringify({
                 customStyles,
                 enabledActions,
+                mcpServer,
                 ...otherOptions
               })};
             `
