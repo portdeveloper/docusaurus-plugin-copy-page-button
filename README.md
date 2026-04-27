@@ -12,6 +12,22 @@
 
 A lightweight Docusaurus plugin that automatically adds a "Copy page" button to your documentation site's sidebar. Perfect for developers who want to quickly extract documentation content for AI assistance, code reviews, or content analysis.
 
+## Used by
+
+Shipping in production on documentation sites across the ecosystem:
+
+<p>
+  <a href="https://ethereum.github.io/execution-apis/" title="Ethereum Execution APIs"><img src="https://github.com/ethereum.png" width="56" height="56" alt="Ethereum"/></a>
+  <a href="https://docs.sui.io" title="Sui (Mysten Labs)"><img src="https://github.com/MystenLabs.png" width="56" height="56" alt="Sui"/></a>
+  <a href="https://docs.monad.xyz" title="Monad"><img src="https://github.com/monad-developers.png" width="56" height="56" alt="Monad"/></a>
+  <a href="https://dev.flare.network" title="Flare"><img src="https://github.com/flare-foundation.png" width="56" height="56" alt="Flare"/></a>
+  <a href="https://docs.kaia.io" title="Kaia"><img src="https://github.com/kaiachain.png" width="56" height="56" alt="Kaia"/></a>
+  <a href="https://docs.nillion.com" title="Nillion"><img src="https://github.com/NillionNetwork.png" width="56" height="56" alt="Nillion"/></a>
+  <a href="https://docs.chroniclelabs.org" title="Chronicle"><img src="https://github.com/chronicleprotocol.png" width="56" height="56" alt="Chronicle"/></a>
+</p>
+
+Live on [Ethereum execution-apis](https://ethereum.github.io/execution-apis/), [Sui](https://docs.sui.io), [Walrus](https://docs.wal.app), [Seal](https://seal-docs.wal.app), [SuiNS](https://docs.suins.io), [Monad](https://docs.monad.xyz), [Flare](https://dev.flare.network), [Kaia](https://docs.kaia.io), [Nillion](https://docs.nillion.com), and [Chronicle](https://docs.chroniclelabs.org). Using this plugin? Open a PR to add your project.
+
 ## Why Use This Plugin?
 
 - **AI-Ready Content**: Instantly convert documentation pages to clean markdown for ChatGPT, Claude, or other AI tools
