@@ -1,20 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./styles.module.css";
-
-// Static selectors for content cleanup
-const SELECTORS_TO_REMOVE = [
-  ".theme-edit-this-page",
-  ".theme-last-updated",
-  ".pagination-nav",
-  ".theme-doc-breadcrumbs",
-  ".theme-doc-footer",
-  "button",
-  ".copy-code-button",
-  ".buttonGroup",
-  ".clean-btn",
-  ".theme-code-block-title",
-  ".line-number",
-];
+const {
+  extractPageMarkdownFromDocument,
+  getMarkdownRouteUrl,
+} = require("./htmlToMarkdown");
 
 // Utility function to merge custom styles with default classes
 const mergeStyles = (defaultClassName, customStyleConfig = {}) => {
@@ -49,7 +38,8 @@ const separatePositioningStyles = (styleObject = {}) => {
 
 export default function CopyPageButton({
   customStyles = {},
-  enabledActions = ['copy', 'view', 'chatgpt', 'claude', 'gemini']
+  enabledActions = ['copy', 'view', 'chatgpt', 'claude', 'gemini'],
+  generateMarkdownRoutes = false
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [pageContent, setPageContent] = useState("");
@@ -103,258 +93,8 @@ export default function CopyPageButton({
     }
   }, []);
 
-  const convertToMarkdown = (element) => {
-    const cleanText = (text) => {
-      return text
-        .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width spaces
-        .replace(/\u00A0/g, " ") // Replace non-breaking spaces
-        .replace(/[\u2018\u2019]/g, "'") // Smart quotes
-        .replace(/[\u201C\u201D]/g, '"')
-        .replace(/â€‹/g, "") // Clean encoding issues
-        .replace(/\s+/g, " ") // Normalize whitespace
-        .trim();
-    };
-
-    const processNode = (node) => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        return cleanText(node.textContent);
-      }
-
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        const tag = node.tagName.toLowerCase();
-        const childResults = Array.from(node.childNodes).map((child) =>
-          processNode(child)
-        );
-
-        // Join child results with intelligent spacing
-        let children = "";
-        for (let i = 0; i < childResults.length; i++) {
-          const current = childResults[i];
-          const previous = i > 0 ? childResults[i - 1] : "";
-
-          if (current) {
-            if (
-              previous &&
-              !previous.match(/[\s\n]$/) &&
-              !current.match(/^[\s\n]/) &&
-              previous.trim() &&
-              current.trim()
-            ) {
-              children += " ";
-            }
-            children += current;
-          }
-        }
-
-        switch (tag) {
-          case "h1":
-            return `\n# ${children.trim()}\n\n`;
-          case "h2":
-            return `\n## ${children.trim()}\n\n`;
-          case "h3":
-            return `\n### ${children.trim()}\n\n`;
-          case "h4":
-            return `\n#### ${children.trim()}\n\n`;
-          case "h5":
-            return `\n##### ${children.trim()}\n\n`;
-          case "h6":
-            return `\n###### ${children.trim()}\n\n`;
-          case "p":
-            return children.trim() ? `${children.trim()}\n\n` : "\n";
-          case "strong":
-          case "b":
-            return `**${children}**`;
-          case "em":
-          case "i":
-            return `*${children}*`;
-          case "code":
-            if (node.parentElement?.tagName.toLowerCase() === "pre") {
-              return children;
-            }
-            const cleanInlineCode = children
-              .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width spaces
-              .replace(/\u00A0/g, " ") // Replace non-breaking spaces
-              .trim();
-            return `\`${cleanInlineCode}\``;
-          case "pre":
-            const codeElement = node.querySelector("code");
-            if (codeElement) {
-              const language =
-                (codeElement.className?.match(/language-(\w+)/) ||
-                  node.className?.match(/language-(\w+)/) ||
-                  codeElement.className?.match(/hljs-(\w+)/) ||
-                  codeElement.className?.match(/prism-(\w+)/) ||
-                  [])[1] || "";
-
-              let codeContent = "";
-
-              try {
-                // Method 1: Try to get content from data attributes (some themes store original content)
-                const originalContent =
-                  codeElement.getAttribute("data-code") ||
-                  node.getAttribute("data-code") ||
-                  codeElement.getAttribute("data-raw");
-
-                if (originalContent) {
-                  codeContent = originalContent;
-                } else {
-                  // Method 2: Look for individual code lines in specific containers
-                  const codeLines = codeElement.querySelectorAll(
-                    "span[data-line], .token-line, .code-line, .highlight-line"
-                  );
-                  if (codeLines.length > 0) {
-                    codeContent = Array.from(codeLines)
-                      .map((lineElement) => {
-                        return lineElement?.textContent || "";
-                      })
-                      .join("\n");
-                  } else {
-                    // Method 3: Look for div-based line structure
-                    const codeLineDivs = codeElement.querySelectorAll("div");
-                    if (codeLineDivs.length > 0) {
-                      codeContent = Array.from(codeLineDivs)
-                        .map((lineDiv) => {
-                          // Skip if this looks like a line number container
-                          if (
-                            lineDiv.className?.includes("codeLineNumber") ||
-                            lineDiv.className?.includes("LineNumber") ||
-                            lineDiv.className?.includes("line-number") ||
-                            lineDiv.style?.userSelect === "none"
-                          ) {
-                            return null;
-                          }
-                          return lineDiv?.textContent || "";
-                        })
-                        .filter((line) => line !== null)
-                        .join("\n");
-                    } else {
-                      // Method 4: Direct text extraction with cleanup
-                      let rawText = codeElement.textContent || "";
-
-                      // Remove line numbers at the start of lines (common pattern: "1 ", "12 ", etc.)
-                      rawText = rawText.replace(/^\d+\s+/gm, "");
-
-                      // Remove copy button text and other UI elements
-                      rawText = rawText.replace(/^Copy$/gm, "");
-                      rawText = rawText.replace(/^Copied!$/gm, "");
-                      rawText = rawText.replace(
-                        /^\s*Copy to clipboard\s*$/gm,
-                        ""
-                      );
-
-                      codeContent = rawText;
-                    }
-                  }
-                }
-
-                // Final cleanup
-                codeContent = codeContent
-                  .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width spaces
-                  .replace(/\u00A0/g, " ") // Replace non-breaking spaces
-                  .trim();
-
-                // Remove empty lines at start and end
-                codeContent = codeContent.replace(/^\n+|\n+$/g, "");
-              } catch (error) {
-                // Fallback to simple text extraction if anything fails
-                codeContent = codeElement.textContent || "";
-              }
-
-              return `\n\`\`\`${language}\n${codeContent}\n\`\`\`\n\n`;
-            }
-            return `\n\`\`\`\n${children}\n\`\`\`\n\n`;
-          case "ul":
-            return `\n${children}`;
-          case "ol":
-            const items = Array.from(node.querySelectorAll("li"));
-            return (
-              "\n" +
-              items
-                .map(
-                  (item, index) =>
-                    `${index + 1}. ${processNode(item)
-                      .replace(/^- /, "")
-                      .trim()}\n`
-                )
-                .join("")
-            );
-          case "li":
-            return `- ${children.trim()}\n`;
-          case "a":
-            const href = node.getAttribute("href");
-            if (href && !href.startsWith("#") && children.trim()) {
-              return `[${children.trim()}](${href})`;
-            }
-            return children;
-          case "br":
-            return "\n";
-          case "blockquote":
-            return `\n> ${children.trim()}\n\n`;
-          case "table":
-            return `\n${children}\n`;
-          case "tr":
-            return `${children}\n`;
-          case "th":
-          case "td":
-            return `| ${children.trim()} `;
-          case "img":
-            const src = node.getAttribute("src");
-            const alt = node.getAttribute("alt") || "";
-            return src ? `![${alt}](${src})` : "";
-          case "div":
-          case "section":
-          case "article":
-            // Handle admonitions
-            if (node.classList?.contains("admonition")) {
-              const type =
-                Array.from(node.classList)
-                  .find((cls) => cls.startsWith("alert--"))
-                  ?.replace("alert--", "") || "note";
-              return `\n> **${type.toUpperCase()}**: ${children.trim()}\n\n`;
-            }
-            return children + "\n";
-          default:
-            return children;
-        }
-      }
-
-      return "";
-    };
-
-    return processNode(element)
-      .replace(/\n{3,}/g, "\n\n") // Limit multiple newlines
-      .replace(/^\n+|\n+$/g, "") // Trim newlines
-      .trim();
-  };
-
   const extractPageContent = () => {
-    const mainContent =
-      document.querySelector("main article") ||
-      document.querySelector("main .markdown");
-
-    if (!mainContent) {
-      const alternatives = document.querySelector("main") || document.querySelector("article") || document.querySelector(".main-wrapper");
-      if (!alternatives) return "";
-    }
-
-    const targetElement = mainContent || document.querySelector("main") || document.querySelector("article");
-    const clone = targetElement.cloneNode(true);
-
-    // Remove unwanted elements
-    SELECTORS_TO_REMOVE.forEach((selector) => {
-      clone.querySelectorAll(selector).forEach((el) => el.remove());
-    });
-
-    // Extract title from first H1 and remove it from content
-    const firstH1 = clone.querySelector("h1");
-    const title = firstH1?.textContent.trim() || "Documentation Page";
-    if (firstH1) {
-      firstH1.remove();
-    }
-
-    const content = convertToMarkdown(clone);
-    const currentUrl = window.location.href;
-    return `# ${title}\n\nURL: ${currentUrl}\n\n${content}`;
+    return extractPageMarkdownFromDocument(document, window.location.href);
   };
 
   const copyToClipboard = async (text) => {
@@ -388,7 +128,9 @@ export default function CopyPageButton({
 
   const openInAI = (baseUrl, queryParam = 'q') => {
     try {
-      const currentUrl = window.location.href;
+      const currentUrl = generateMarkdownRoutes
+        ? getMarkdownRouteUrl(window.location.href)
+        : window.location.href;
       const prompt = encodeURIComponent(
         `Please read and explain this documentation page: ${currentUrl}
 

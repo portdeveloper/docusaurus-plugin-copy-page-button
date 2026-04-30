@@ -80,7 +80,8 @@ if (ExecutionEnvironment.canUseDOM) {
     const renderOptions = getPluginOptions();
     root.render(React.createElement(CopyPageButton, {
       customStyles: renderOptions.customStyles,
-      enabledActions: renderOptions.enabledActions
+      enabledActions: renderOptions.enabledActions,
+      generateMarkdownRoutes: renderOptions.generateMarkdownRoutes
     }));
   };
 
@@ -141,7 +142,8 @@ if (ExecutionEnvironment.canUseDOM) {
     const renderOptions = getPluginOptions();
     root.render(React.createElement(CopyPageButton, {
       customStyles: renderOptions.customStyles,
-      enabledActions: renderOptions.enabledActions
+      enabledActions: renderOptions.enabledActions,
+      generateMarkdownRoutes: renderOptions.generateMarkdownRoutes
     }));
   };
 
@@ -218,7 +220,8 @@ if (ExecutionEnvironment.canUseDOM) {
     const renderOptions = getPluginOptions();
     root.render(React.createElement(CopyPageButton, {
       customStyles: renderOptions.customStyles,
-      enabledActions: renderOptions.enabledActions
+      enabledActions: renderOptions.enabledActions,
+      generateMarkdownRoutes: renderOptions.generateMarkdownRoutes
     }));
 
     // Reset injection attempts on successful injection

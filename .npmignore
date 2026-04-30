@@ -1,2 +1,7 @@
 .claude/
 CLAUDE.md
+.npmrc
+AGENTS.md
+launch-posts.md
+md-routes-prompt.md
+*.tgz

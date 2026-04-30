@@ -243,6 +243,18 @@ module.exports = {
 };
 ```
 
+## Markdown URL routes
+
+Set `generateMarkdownRoutes: true` to emit a plain-markdown URL for each generated documentation page:
+
+```js
+module.exports = {
+  plugins: [["docusaurus-plugin-copy-page-button", { generateMarkdownRoutes: true }]],
+};
+```
+
+For a Docusaurus page rendered at `build/page/index.html`, the plugin writes `build/page.md`, so static hosts serve it at `https://your-docs.com/page.md`. Users can now share `https://your-docs.com/page.md` directly with Claude, ChatGPT, or any tool that can fetch URLs as context. When this option is enabled, the AI tool actions also point at the `.md` URL.
+
 ## Local Development
 
 To test this plugin locally during development:
