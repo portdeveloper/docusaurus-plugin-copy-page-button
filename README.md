@@ -3,6 +3,7 @@
 [![npm version](https://badge.fury.io/js/docusaurus-plugin-copy-page-button.svg)](https://www.npmjs.com/package/docusaurus-plugin-copy-page-button)
 [![npm downloads](https://img.shields.io/npm/dm/docusaurus-plugin-copy-page-button.svg)](https://www.npmjs.com/package/docusaurus-plugin-copy-page-button)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Mentioned in Awesome Docusaurus](https://awesome.re/mentioned-badge.svg)](https://github.com/webbertakken/awesome-docusaurus)
 
 **[Live Demo](https://portdeveloper.github.io/copy-page-button-showcase/)**
 
