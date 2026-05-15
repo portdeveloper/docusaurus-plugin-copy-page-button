@@ -386,15 +386,14 @@ export default function CopyPageButton({
     }
   };
 
-  const openInAI = (baseUrl, queryParam = 'q') => {
+  const openInAI = (baseUrl, queryParam = 'q', extraParams = {}) => {
     try {
       const currentUrl = window.location.href;
-      const prompt = encodeURIComponent(
-        `Please read and explain this documentation page: ${currentUrl}
+      const prompt = `Please read and explain this documentation page: ${currentUrl}
 
-Please provide a clear summary and help me understand the key concepts covered in this documentation.`
-      );
-      window.open(`${baseUrl}?${queryParam}=${prompt}`, "_blank");
+Please provide a clear summary and help me understand the key concepts covered in this documentation.`;
+      const params = new URLSearchParams({ [queryParam]: prompt, ...extraParams });
+      window.open(`${baseUrl}?${params.toString()}`, "_blank");
     } catch (err) {
       // Silently fail
     }
@@ -483,7 +482,7 @@ Please provide a clear summary and help me understand the key concepts covered i
           />
         </svg>
       ),
-      action: () => openInAI("https://chat.openai.com/"),
+      action: () => openInAI("https://chatgpt.com/"),
     },
     {
       id: "claude",
@@ -521,7 +520,7 @@ Please provide a clear summary and help me understand the key concepts covered i
           />
         </svg>
       ),
-      action: () => openInAI("https://gemini.google.com/guided-learning", "query"),
+      action: () => openInAI("https://www.google.com/search", "q", { udm: "50" }),
     },
   ];
 
