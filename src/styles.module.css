@@ -1,5 +1,5 @@
 /* Position button container on top of sidebar */
-#copy-page-button-container {
+#copy-page-button-container:not([data-fallback]) {
   position: absolute;
   top: -60px;
   left: 0;
@@ -7,6 +7,10 @@
   z-index: 100;
   pointer-events: none;
   padding-bottom: 20px;
+  /* Reserve dimensions so the button slot is sized before React mounts.
+     Prevents layout shift when the button finishes hydrating. */
+  min-height: 56px;
+  box-sizing: border-box;
 }
 
 #copy-page-button-container > * {
@@ -29,6 +33,7 @@
   border-radius: 6px;
   color: var(--ifm-navbar-link-color);
   cursor: pointer;
+  font-family: var(--ifm-font-family-base, inherit);
   font-size: 14px;
   font-weight: 500;
   transition: all 0.2s ease;
@@ -73,6 +78,7 @@
   border: none;
   color: var(--ifm-font-color-base);
   cursor: pointer;
+  font-family: var(--ifm-font-family-base, inherit);
   text-align: left;
   transition: background-color 0.2s ease;
   border-bottom: 1px solid var(--ifm-color-emphasis-200);
@@ -190,7 +196,7 @@
   hyphens: auto;
 }
 
-:global(#copy-page-button-container) {
+:global(#copy-page-button-container:not([data-fallback])) {
   @media (max-width: 996px) {
     position: absolute;
     right: 16px;

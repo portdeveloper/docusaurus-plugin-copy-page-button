@@ -14,14 +14,19 @@ if (ExecutionEnvironment.canUseDOM) {
     return (typeof window !== "undefined" && window.__COPY_PAGE_BUTTON_OPTIONS__) || {};
   };
 
-  // Fallback injection for pages without TOC
+  // Fallback injection for pages without TOC.
+  // Inject the button inline at the top of the article (right after the
+  // breadcrumbs if present, otherwise as the article's first child). Keeps the
+  // button in normal document flow — fixed-viewport placement is brittle
+  // because it overlaps navbars/edit-this-page widgets.
   const injectToFallbackLocation = () => {
-    // Look for main article content area
-    const articleContent = 
-      document.querySelector("article") ||
+    // Prefer the actual <article> element since that's where breadcrumbs/h1 live.
+    const article = document.querySelector("article");
+    const articleContent =
+      article ||
+      document.querySelector(".theme-doc-markdown") ||
       document.querySelector(".markdown") ||
       document.querySelector('[class*="docItemContainer"]') ||
-      document.querySelector('.theme-doc-markdown') ||
       document.querySelector('main');
 
     if (!articleContent) {
@@ -39,34 +44,40 @@ if (ExecutionEnvironment.canUseDOM) {
 
     container = document.createElement("div");
     container.id = "copy-page-button-container";
+    container.dataset.fallback = "true";
 
-    // Apply custom positioning styles to the container if provided
     const pluginOptions = getPluginOptions();
     const customStyles = pluginOptions.customStyles || {};
     const buttonStyles = customStyles.button?.style || {};
-    
-    // Check if button config has positioning styles that should be applied to container
+
+    // If the user explicitly set positioning props on the button config, honor them.
     const positioningProps = ['position', 'top', 'right', 'bottom', 'left', 'zIndex', 'transform'];
+    let hasCustomPositioning = false;
     positioningProps.forEach(prop => {
       if (buttonStyles[prop] !== undefined) {
         container.style[prop] = buttonStyles[prop];
+        hasCustomPositioning = true;
       }
     });
-    
-    // For fallback injection, use fixed positioning in top-right of viewport if no custom positioning
-    const hasCustomPositioning = positioningProps.some(prop => buttonStyles[prop] !== undefined);
+
+    // Default fallback: inline, right-aligned within the article column. Sits
+    // in the normal flow above the H1 so it doesn't fight with anything else.
     if (!hasCustomPositioning) {
-      container.style.position = 'fixed';
-      container.style.top = '80px';
-      container.style.right = '20px';
-      container.style.zIndex = '1000';
+      container.style.display = 'flex';
+      container.style.justifyContent = 'flex-end';
+      container.style.margin = '0 0 12px 0';
     }
-    
-    // Also apply container-specific styles
+
     const containerStyles = customStyles.container?.style || {};
     Object.assign(container.style, containerStyles);
 
-    articleContent.insertBefore(container, articleContent.firstChild);
+    // Place after breadcrumbs if present (typical Docusaurus docs layout), otherwise prepend.
+    const breadcrumbs = articleContent.querySelector(".theme-doc-breadcrumbs");
+    if (breadcrumbs && breadcrumbs.parentElement === articleContent) {
+      breadcrumbs.insertAdjacentElement("afterend", container);
+    } else {
+      articleContent.insertBefore(container, articleContent.firstChild);
+    }
 
     if (root) {
       try {
@@ -292,61 +303,72 @@ if (ExecutionEnvironment.canUseDOM) {
     }
   };
 
-  // Reliable initialization for page refresh/initial load
+  let mountObserver = null;
+
+  // Find the ToC sidebar element using all known selectors.
+  const findSidebar = () =>
+    document.querySelector(".theme-doc-toc-desktop") ||
+    document.querySelector(".table-of-contents") ||
+    document.querySelector('[class*="tableOfContents"]') ||
+    document.querySelector('[class*="toc"]');
+
+  // Find the article content element (used for the no-ToC fallback).
+  const findArticleContent = () =>
+    document.querySelector("article") ||
+    document.querySelector(".theme-doc-markdown") ||
+    document.querySelector(".markdown") ||
+    document.querySelector('[class*="docItemContainer"]') ||
+    document.querySelector('main');
+
+  // Reliable initialization for page refresh/initial load.
+  // Uses MutationObserver as the primary detection mechanism — fires the
+  // moment the ToC or article mounts, without waiting for a setTimeout poll
+  // cycle. Falls back to periodic polling as a safety net for edge cases
+  // where the observer misses the event (e.g. async theme hydration).
   const initializeButton = () => {
-    // Reset injection attempts to ensure button can be re-injected after refresh
     injectionAttempts = 0;
-    
-    // Multi-strategy initialization for page refresh
-    const attemptInjection = () => {
-      // Strategy 1: Try immediate injection
-      const sidebar = document.querySelector(".theme-doc-toc-desktop") ||
-        document.querySelector(".table-of-contents") ||
-        document.querySelector('[class*="tableOfContents"]') ||
-        document.querySelector('[class*="toc"]');
-        
-      const articleContent = 
-        document.querySelector("article") ||
-        document.querySelector(".markdown") ||
-        document.querySelector('[class*="docItemContainer"]') ||
-        document.querySelector('.theme-doc-markdown') ||
-        document.querySelector('main');
-        
-      if (sidebar || articleContent) {
-        // Suitable container found - inject with reasonable delay
-        setTimeout(reliableInjectCopyPageButton, 100);
-      } else {
-        // Strategy 2: Wait for Docusaurus to fully load
-        if (window.docusaurus || document.readyState === 'complete') {
-          setTimeout(() => {
-            reliableInjectCopyPageButton();
-            // Start backup periodic checking
-            startPeriodicCheck();
-          }, 300);
-        } else {
-          // Strategy 3: Wait for framework readiness
-          setTimeout(() => {
-            reliableInjectCopyPageButton();
-            startPeriodicCheck();
-          }, 500);
-        }
+
+    const stopMountObserver = () => {
+      if (mountObserver) {
+        mountObserver.disconnect();
+        mountObserver = null;
       }
     };
-    
-    // Use appropriate timing based on document state
-    if (document.readyState === 'complete') {
-      attemptInjection();
-    } else {
-      // Wait for document to be complete
-      const waitForComplete = () => {
-        if (document.readyState === 'complete' || window.docusaurus) {
-          setTimeout(attemptInjection, 100);
-        } else {
-          setTimeout(waitForComplete, 100);
-        }
-      };
-      waitForComplete();
+
+    const tryInject = () => {
+      const sidebar = findSidebar();
+      const articleContent = findArticleContent();
+      if (!sidebar && !articleContent) {
+        return false;
+      }
+      reliableInjectCopyPageButton();
+      return true;
+    };
+
+    // Strategy 1: synchronous attempt if DOM is already there.
+    if (tryInject()) {
+      return;
     }
+
+    // Strategy 2: MutationObserver watches for the ToC or article to appear.
+    // This is the primary mechanism — it fires immediately on mount instead
+    // of waiting for the next poll tick.
+    stopMountObserver();
+    mountObserver = new MutationObserver(() => {
+      if (tryInject()) {
+        stopMountObserver();
+      }
+    });
+    mountObserver.observe(document.body, { childList: true, subtree: true });
+
+    // Strategy 3: backup periodic check. Some Docusaurus hydration patterns
+    // (especially with @docusaurus/faster) re-render the ToC after initial
+    // mount, which the observer may have already disconnected from.
+    startPeriodicCheck();
+
+    // Hard stop after 15s so we don't keep an observer alive forever on
+    // pages that genuinely have no article + no ToC (404s, custom layouts).
+    setTimeout(stopMountObserver, 15000);
   };
 
   // Periodic check - only for initial page load issues
