@@ -98,8 +98,11 @@ const getHtmlRoutePaths = (outDir) => {
 module.exports = function copyPageButtonPlugin(context, options = {}) {
   const {
     customStyles = {},
-    enabledActions = ['copy', 'view', 'chatgpt', 'claude', 'gemini'],
+    enabledActions,
     generateMarkdownRoutes = false,
+    injectButton = true,
+    placement = 'auto',
+    mcpServer = null,
     ...otherOptions
   } = options;
 
@@ -107,7 +110,7 @@ module.exports = function copyPageButtonPlugin(context, options = {}) {
     name: "copy-page-button-plugin",
 
     getClientModules() {
-      return [path.resolve(__dirname, "./client.js")];
+      return injectButton ? [path.resolve(__dirname, "./client.js")] : [];
     },
 
     injectHtmlTags() {
@@ -120,6 +123,8 @@ module.exports = function copyPageButtonPlugin(context, options = {}) {
                 customStyles,
                 enabledActions,
                 generateMarkdownRoutes,
+                placement,
+                mcpServer,
                 ...otherOptions
               })};
             `

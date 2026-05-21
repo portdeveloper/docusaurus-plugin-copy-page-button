@@ -9,9 +9,9 @@
 
 <img src="https://github.com/user-attachments/assets/8e7351ba-0cab-489c-bbcf-543603c3bcf1" alt="Docusaurus Copy Page Button Plugin Preview" width="418" height="448" />
 
-**Extract Docusaurus documentation content as markdown for AI tools like ChatGPT, Claude, and Gemini**
+**Extract Docusaurus documentation content as markdown for AI tools like ChatGPT, Claude, Perplexity, and Gemini**
 
-A lightweight Docusaurus plugin that automatically adds a "Copy page" button to your documentation site's sidebar. Perfect for developers who want to quickly extract documentation content for AI assistance, code reviews, or content analysis.
+A lightweight Docusaurus plugin that adds a "Copy page" button to your documentation site. Perfect for developers who want to quickly extract documentation content for AI assistance, code reviews, or content analysis.
 
 ## Used by
 
@@ -33,7 +33,7 @@ Live on [Ethereum execution-apis](https://ethereum.github.io/execution-apis/), [
 
 ## Why Use This Plugin?
 
-- **AI-Ready Content**: Instantly convert documentation pages to clean markdown for ChatGPT, Claude, or other AI tools
+- **AI-Ready Content**: Instantly convert documentation pages to clean markdown for ChatGPT, Claude, Perplexity, or other AI tools
 - **Developer Productivity**: Copy entire documentation pages without manual selection and cleanup
 - **Zero Configuration**: Works out of the box - just install and go
 - **Documentation Workflow**: Streamline the process of getting documentation context for AI assistance
@@ -42,9 +42,11 @@ Live on [Ethereum execution-apis](https://ethereum.github.io/execution-apis/), [
 
 - 📋 **Copy page as markdown** - Clean page content extraction
 - 👁️ **View as markdown** - Preview extracted content in new tab
-- 🤖 **AI integration** - Direct "Open in ChatGPT", "Open in Claude", and "Open in Gemini" buttons
+- 🤖 **AI integration** - Direct "Open in ChatGPT", "Open in Claude", "Open in Perplexity", and "Open in Gemini" buttons
 - ⚙️ **Configurable actions** - Show/hide specific dropdown actions (perfect for private sites)
-- ⚡ **Auto-injection** - Automatically adds to table of contents sidebar (no configuration needed)
+- ⚡ **Auto-injection** - Automatically adds to the docs page (no configuration needed)
+- 🧩 **Theme integration** - Import the React component directly when your site needs exact placement or no layout shift
+- 🔌 **Optional MCP actions** - Add Cursor and VS Code MCP install links when your docs expose an MCP server
 - 🎨 **Theme-aware** - Supports light/dark themes
 - 🎨 **Customizable styling** - Easy custom CSS classes and inline styles
 - 📱 **Mobile-friendly** - Responsive design
@@ -58,7 +60,7 @@ npm install docusaurus-plugin-copy-page-button
 
 ## Usage
 
-### Option 1: Auto-injection (Recommended)
+### Option 1: Auto-injection
 
 Add the plugin to your `docusaurus.config.js`:
 
@@ -68,9 +70,31 @@ module.exports = {
 };
 ```
 
-The button will automatically appear in your table of contents sidebar!
+The button automatically appears in the table of contents sidebar when one is visible. On mobile and no-TOC pages, it falls back to the top of the article.
 
-### Option 2: Custom positioning
+### Option 2: Choose placement
+
+Use `placement: "article"` if your theme header, sidebar, or table of contents layout makes the sidebar placement awkward:
+
+```js
+module.exports = {
+  plugins: [
+    [
+      "docusaurus-plugin-copy-page-button",
+      {
+        placement: "article",
+      },
+    ],
+  ],
+};
+```
+
+Available values:
+- `"auto"` - sidebar on desktop when visible, article on mobile/no-TOC pages
+- `"toc"` - table of contents only
+- `"article"` - top of the article column
+
+### Option 3: Custom positioning
 
 Use custom styles to position the button differently:
 
@@ -95,11 +119,48 @@ module.exports = {
 };
 ```
 
+### Option 4: Render the React component yourself
+
+For high-traffic docs sites that want zero client-side placement shift, disable auto-injection and render the button from a swizzled Docusaurus theme component.
+
+```js
+// docusaurus.config.js
+module.exports = {
+  plugins: [
+    [
+      "docusaurus-plugin-copy-page-button",
+      {
+        injectButton: false,
+        generateMarkdownRoutes: true,
+      },
+    ],
+  ],
+};
+```
+
+```tsx
+// src/theme/DocItem/Layout/index.tsx
+import CopyPageButton from "docusaurus-plugin-copy-page-button/react";
+
+export default function DocItemLayout(props) {
+  return (
+    <>
+      <div style={{display: "flex", justifyContent: "flex-end"}}>
+        <CopyPageButton generateMarkdownRoutes />
+      </div>
+      {/* render your normal Docusaurus DocItem layout here */}
+    </>
+  );
+}
+```
+
+This path is best when maintainers care about first paint, exact visual placement, or avoiding any post-hydration DOM insertion.
+
 ## Configuration
 
 ### Enabled Actions
 
-You can control which actions appear in the dropdown menu using the `enabledActions` option. This is particularly useful for private documentation sites where the AI tool links (ChatGPT/Claude/Gemini) won't work properly.
+You can control which actions appear in the dropdown menu using the `enabledActions` option. This is particularly useful for private documentation sites where the AI tool links (ChatGPT/Claude/Perplexity/Gemini) won't work properly.
 
 ```js
 module.exports = {
@@ -120,9 +181,13 @@ module.exports = {
 - `'view'` - View as Markdown in new tab
 - `'chatgpt'` - Open in ChatGPT
 - `'claude'` - Open in Claude
+- `'perplexity'` - Open in Perplexity
 - `'gemini'` - Open in Gemini
+- `'mcp-copy'` - Copy MCP server JSON (shown when `mcpServer` is configured)
+- `'mcp-cursor'` - Install MCP server in Cursor (shown when `mcpServer` is configured)
+- `'mcp-vscode'` - Install MCP server in VS Code (shown when `mcpServer` is configured)
 
-**Default:** All actions are enabled: `['copy', 'view', 'chatgpt', 'claude', 'gemini']`
+**Default:** Standard actions are enabled: `['copy', 'view', 'chatgpt', 'claude', 'perplexity', 'gemini']`. MCP actions are enabled automatically only when `mcpServer` is configured.
 
 **Example configurations:**
 
@@ -133,9 +198,31 @@ enabledActions: ['copy']
 // Copy and view only (no AI tools)
 enabledActions: ['copy', 'view']
 
-// All actions including AI tools (default)
-enabledActions: ['copy', 'view', 'chatgpt', 'claude', 'gemini']
+// All standard AI actions (default)
+enabledActions: ['copy', 'view', 'chatgpt', 'claude', 'perplexity', 'gemini']
 ```
+
+### MCP server actions
+
+If your documentation site exposes an MCP server, configure it to add MCP actions to the dropdown:
+
+```js
+module.exports = {
+  plugins: [
+    [
+      "docusaurus-plugin-copy-page-button",
+      {
+        mcpServer: {
+          name: "my-docs",
+          url: "https://docs.example.com/mcp",
+        },
+      },
+    ],
+  ],
+};
+```
+
+The plugin can copy the MCP JSON config and generate install links for Cursor and VS Code. Cursor install links follow Cursor's MCP deeplink format, and VS Code install links use `vscode:mcp/install`.
 
 ### Custom Styling
 
@@ -313,7 +400,7 @@ The plugin intelligently extracts page content by:
 
 ## Use Cases
 
-- **AI-Assisted Development**: Quickly share documentation context with ChatGPT, Claude, or Gemini for coding help
+- **AI-Assisted Development**: Quickly share documentation context with ChatGPT, Claude, Perplexity, or Gemini for coding help
 - **Code Reviews**: Extract relevant documentation for code review discussions
 - **Content Analysis**: Analyze documentation structure and content for improvements
 - **Knowledge Sharing**: Easily share specific documentation sections with team members
@@ -321,7 +408,7 @@ The plugin intelligently extracts page content by:
 
 ## SEO Keywords
 
-Docusaurus plugin, copy page button, extract documentation, markdown conversion, AI tools integration, ChatGPT documentation, Claude AI, Gemini AI, content extraction, developer tools, documentation productivity, React plugin, JavaScript documentation tools.
+Docusaurus plugin, copy page button, extract documentation, markdown conversion, AI tools integration, ChatGPT documentation, Claude AI, Perplexity AI, Gemini AI, MCP, content extraction, developer tools, documentation productivity, React plugin, JavaScript documentation tools.
 
 ## Contributing
 

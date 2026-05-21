@@ -5,6 +5,10 @@ const {
   getMarkdownRouteUrl,
 } = require("./htmlToMarkdown");
 
+const DEFAULT_ACTIONS = ['copy', 'view', 'chatgpt', 'claude', 'perplexity', 'gemini'];
+const DEFAULT_MCP_ACTIONS = ['mcp-copy', 'mcp-cursor', 'mcp-vscode'];
+const POSITIONING_PROPS = ['position', 'top', 'right', 'bottom', 'left', 'zIndex', 'transform'];
+
 // Utility function to merge custom styles with default classes
 const mergeStyles = (defaultClassName, customStyleConfig = {}) => {
   const { className: customClassName, style: customStyle } = customStyleConfig;
@@ -21,12 +25,11 @@ const mergeStyles = (defaultClassName, customStyleConfig = {}) => {
 
 // Utility function to separate positioning styles from other styles
 const separatePositioningStyles = (styleObject = {}) => {
-  const positioningProps = ['position', 'top', 'right', 'bottom', 'left', 'zIndex', 'transform'];
   const positioning = {};
   const nonPositioning = {};
   
   Object.entries(styleObject).forEach(([key, value]) => {
-    if (positioningProps.includes(key)) {
+    if (POSITIONING_PROPS.includes(key)) {
       positioning[key] = value;
     } else {
       nonPositioning[key] = value;
@@ -38,8 +41,9 @@ const separatePositioningStyles = (styleObject = {}) => {
 
 export default function CopyPageButton({
   customStyles = {},
-  enabledActions = ['copy', 'view', 'chatgpt', 'claude', 'gemini'],
-  generateMarkdownRoutes = false
+  enabledActions,
+  generateMarkdownRoutes = false,
+  mcpServer = null
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [pageContent, setPageContent] = useState("");
@@ -77,9 +81,15 @@ export default function CopyPageButton({
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
+      const dropdownWidth = 300;
+      const viewportPadding = 8;
+      const maxLeft = window.innerWidth - dropdownWidth - viewportPadding;
       setDropdownPosition({
         top: rect.bottom + 8,
-        left: rect.right - 300, // Align dropdown right edge with button
+        left: Math.max(
+          viewportPadding,
+          Math.min(rect.right - dropdownWidth, maxLeft)
+        ),
       });
     }
   }, [isOpen]);
@@ -97,6 +107,27 @@ export default function CopyPageButton({
     return extractPageMarkdownFromDocument(document, window.location.href);
   };
 
+  const writeTextToClipboard = async (text) => {
+    if (!text || text.trim() === '') {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+    } catch (err) {
+      // Silently fail
+    }
+  };
+
   const copyToClipboard = async (text) => {
     // If no content, try to extract it now
     if (!text || text.trim() === '') {
@@ -109,21 +140,7 @@ export default function CopyPageButton({
       }
     }
 
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-      }
-    } catch (err) {
-      // Silently fail
-    }
+    await writeTextToClipboard(text);
   };
 
   const openInAI = (baseUrl, queryParam = 'q', extraParams = {}) => {
@@ -161,6 +178,76 @@ Please provide a clear summary and help me understand the key concepts covered i
       window.open(url, "_blank");
     } catch (err) {
       // Silently fail
+    }
+  };
+
+  const normalizeMcpServer = () => {
+    if (!mcpServer) {
+      return null;
+    }
+
+    if (typeof mcpServer === "string") {
+      return {
+        name: "docs",
+        config: { url: mcpServer },
+      };
+    }
+
+    const { name = "docs", config, ...serverConfig } = mcpServer;
+    return {
+      name,
+      config: config || serverConfig,
+    };
+  };
+
+  const mcpConfig = normalizeMcpServer();
+  const effectiveEnabledActions = enabledActions || (
+    mcpConfig ? [...DEFAULT_ACTIONS, ...DEFAULT_MCP_ACTIONS] : DEFAULT_ACTIONS
+  );
+
+  const encodeBase64 = (value) => {
+    const text = typeof value === "string" ? value : JSON.stringify(value);
+    if (typeof TextEncoder !== "undefined") {
+      const bytes = new TextEncoder().encode(text);
+      let binary = "";
+      bytes.forEach((byte) => {
+        binary += String.fromCharCode(byte);
+      });
+      return window.btoa(binary);
+    }
+    return window.btoa(text);
+  };
+
+  const buildCursorMcpUrl = () => {
+    if (!mcpConfig) {
+      return null;
+    }
+    return `cursor://anysphere.cursor-deeplink/mcp/install?name=${encodeURIComponent(
+      mcpConfig.name
+    )}&config=${encodeURIComponent(encodeBase64(mcpConfig.config))}`;
+  };
+
+  const buildVscodeMcpUrl = () => {
+    if (!mcpConfig) {
+      return null;
+    }
+    return `vscode:mcp/install?${encodeURIComponent(
+      JSON.stringify({ name: mcpConfig.name, ...mcpConfig.config })
+    )}`;
+  };
+
+  const copyMcpConfig = async () => {
+    if (!mcpConfig) {
+      return;
+    }
+    await writeTextToClipboard(
+      JSON.stringify({ [mcpConfig.name]: mcpConfig.config }, null, 2)
+    );
+  };
+
+  const openMcpUrl = (url) => {
+    if (url) {
+      window.open(url, "_self");
     }
   };
 
@@ -245,6 +332,23 @@ Please provide a clear summary and help me understand the key concepts covered i
       action: () => openInAI("https://claude.ai/new"),
     },
     {
+      id: "perplexity",
+      title: "Open in Perplexity",
+      description: "Ask questions about this page",
+      icon: (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M22 12.2H13.4V3.7l-1.4 1.2V12.2H3.4l8.6 7.5V22h1.4v-2.3l8.6-7.5zM12 18.3 5.7 13H12v5.3zm1.4 0V13h5.9l-5.9 5.3zM12 10.7V5.6l5.7 5.1H12zm-1.4 0H4.3L10 5.6v5.1z" />
+        </svg>
+      ),
+      action: () => openInAI("https://www.perplexity.ai/search", "q"),
+    },
+    {
       id: "gemini",
       title: "Open in Gemini",
       description: "Ask questions about this page",
@@ -264,11 +368,73 @@ Please provide a clear summary and help me understand the key concepts covered i
       ),
       action: () => openInAI("https://www.google.com/search", "q", { udm: "50" }),
     },
+    ...(mcpConfig ? [
+      {
+        id: "mcp-copy",
+        title: "Copy MCP config",
+        description: "Copy MCP server JSON",
+        icon: (
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+          </svg>
+        ),
+        action: copyMcpConfig,
+      },
+      {
+        id: "mcp-cursor",
+        title: "Install in Cursor",
+        description: "Open Cursor MCP installer",
+        icon: (
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 2 2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+        ),
+        action: () => openMcpUrl(buildCursorMcpUrl()),
+      },
+      {
+        id: "mcp-vscode",
+        title: "Install in VS Code",
+        description: "Open VS Code MCP installer",
+        icon: (
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M23.15 2.587 18.21.21a1.494 1.494 0 0 0-1.705.29l-9.46 8.63-4.12-3.128a.999.999 0 0 0-1.276.057L.327 7.261A1 1 0 0 0 .326 8.74L3.899 12 .326 15.26a1 1 0 0 0 .001 1.479L1.65 17.94a.999.999 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.492 1.492 0 0 0 1.704.29l4.942-2.377A1.5 1.5 0 0 0 24 19.88V4.12a1.5 1.5 0 0 0-.85-1.533zm-5.146 14.861L10.826 12l7.178-5.448v10.896z" />
+          </svg>
+        ),
+        action: () => openMcpUrl(buildVscodeMcpUrl()),
+      },
+    ] : []),
   ];
 
   // Filter dropdown items based on enabled actions
   const dropdownItems = allDropdownItems.filter(item =>
-    enabledActions.includes(item.id)
+    effectiveEnabledActions.includes(item.id)
   );
 
   // Handle positioning styles - if button config has positioning, move it to container

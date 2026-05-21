@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 0.6.0 — 2026-05-21
+
+### Added
+
+- Added Perplexity as a first-class AI action.
+- Added optional MCP actions for copying MCP server config and opening Cursor or VS Code MCP install links when `mcpServer` is configured.
+- Added `placement` option with `auto`, `toc`, and `article` modes.
+- Added `injectButton: false` for sites that want to render the React component manually while still using build-time markdown route generation.
+- Added a stable `docusaurus-plugin-copy-page-button/react` component entrypoint with TypeScript declarations.
+- Added TypeScript declarations for plugin options.
+
+### Fixed
+
+- Auto placement now uses article placement on mobile or when the table of contents is hidden, avoiding invisible buttons inside hidden desktop ToC containers.
+- Removed global breadcrumb width overrides from the component stylesheet so manual component usage does not alter host site breadcrumbs.
+
 ## 0.5.2 — 2026-05-16
 
 ### Fixed

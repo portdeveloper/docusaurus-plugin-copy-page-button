@@ -14,6 +14,32 @@ if (ExecutionEnvironment.canUseDOM) {
     return (typeof window !== "undefined" && window.__COPY_PAGE_BUTTON_OPTIONS__) || {};
   };
 
+  const getPlacement = () => getPluginOptions().placement || "auto";
+
+  const isVisible = (element) => {
+    if (!element) {
+      return false;
+    }
+    const style = window.getComputedStyle(element);
+    return (
+      element.offsetWidth > 0 &&
+      element.offsetHeight > 0 &&
+      style.display !== "none" &&
+      style.visibility !== "hidden"
+    );
+  };
+
+  const shouldUseArticlePlacement = (sidebar) => {
+    const placement = getPlacement();
+    if (placement === "article") {
+      return true;
+    }
+    if (placement === "toc") {
+      return false;
+    }
+    return !sidebar || !isVisible(sidebar) || window.innerWidth <= 996;
+  };
+
   // Fallback injection for pages without TOC.
   // Inject the button inline at the top of the article (right after the
   // breadcrumbs if present, otherwise as the article's first child). Keeps the
@@ -92,7 +118,8 @@ if (ExecutionEnvironment.canUseDOM) {
     root.render(React.createElement(CopyPageButton, {
       customStyles: renderOptions.customStyles,
       enabledActions: renderOptions.enabledActions,
-      generateMarkdownRoutes: renderOptions.generateMarkdownRoutes
+      generateMarkdownRoutes: renderOptions.generateMarkdownRoutes,
+      mcpServer: renderOptions.mcpServer
     }));
   };
 
@@ -104,8 +131,12 @@ if (ExecutionEnvironment.canUseDOM) {
       document.querySelector('[class*="tableOfContents"]') ||
       document.querySelector('[class*="toc"]');
 
-    if (!sidebar) {
-      // If no sidebar, try fallback injection to main content area
+    if (!sidebar && getPlacement() === "toc") {
+      return;
+    }
+
+    if (shouldUseArticlePlacement(sidebar)) {
+      // If no visible sidebar, try fallback injection to main content area
       injectToFallbackLocation();
       return;
     }
@@ -154,7 +185,8 @@ if (ExecutionEnvironment.canUseDOM) {
     root.render(React.createElement(CopyPageButton, {
       customStyles: renderOptions.customStyles,
       enabledActions: renderOptions.enabledActions,
-      generateMarkdownRoutes: renderOptions.generateMarkdownRoutes
+      generateMarkdownRoutes: renderOptions.generateMarkdownRoutes,
+      mcpServer: renderOptions.mcpServer
     }));
   };
 
@@ -168,7 +200,14 @@ if (ExecutionEnvironment.canUseDOM) {
       document.querySelector('[class*="tableOfContents"]') ||
       document.querySelector('[class*="toc"]');
 
-    if (!sidebar) {
+    if (!sidebar && getPlacement() === "toc") {
+      if (injectionAttempts < 30) {
+        setTimeout(reliableInjectCopyPageButton, 100);
+      }
+      return;
+    }
+
+    if (shouldUseArticlePlacement(sidebar)) {
       // Try fallback injection to main content area
       const articleContent = 
         document.querySelector("article") ||
@@ -232,7 +271,8 @@ if (ExecutionEnvironment.canUseDOM) {
     root.render(React.createElement(CopyPageButton, {
       customStyles: renderOptions.customStyles,
       enabledActions: renderOptions.enabledActions,
-      generateMarkdownRoutes: renderOptions.generateMarkdownRoutes
+      generateMarkdownRoutes: renderOptions.generateMarkdownRoutes,
+      mcpServer: renderOptions.mcpServer
     }));
 
     // Reset injection attempts on successful injection
@@ -277,9 +317,11 @@ if (ExecutionEnvironment.canUseDOM) {
       document.querySelector('.theme-doc-markdown') ||
       document.querySelector('main');
     
+    const shouldUseArticle = shouldUseArticlePlacement(sidebar);
     const buttonProperlyAttached = container && (
-      (sidebar && sidebar.contains(container)) ||
-      (articleContent && articleContent.contains(container))
+      shouldUseArticle
+        ? articleContent && articleContent.contains(container)
+        : sidebar && sidebar.contains(container)
     );
     
     // Only cleanup and re-inject if button is not properly attached
@@ -396,17 +438,20 @@ if (ExecutionEnvironment.canUseDOM) {
         document.querySelector('.theme-doc-markdown') ||
         document.querySelector('main');
       
-      const needsInjection = (sidebar || articleContent) && (!container || 
-        (!sidebar || !sidebar.contains(container)) && 
-        (!articleContent || !articleContent.contains(container)));
+      const shouldUseArticle = shouldUseArticlePlacement(sidebar);
+      const needsInjection = (sidebar || articleContent) && (!container ||
+        (shouldUseArticle
+          ? (!articleContent || !articleContent.contains(container))
+          : (!sidebar || !sidebar.contains(container))));
       
       if (needsInjection) {
         reliableInjectCopyPageButton();
       }
       
       const buttonProperlyAttached = container && (
-        (sidebar && sidebar.contains(container)) ||
-        (articleContent && articleContent.contains(container))
+        shouldUseArticle
+          ? articleContent && articleContent.contains(container)
+          : sidebar && sidebar.contains(container)
       );
       
       if (recheckCount >= maxRechecks || buttonProperlyAttached) {
@@ -442,9 +487,11 @@ if (ExecutionEnvironment.canUseDOM) {
           document.querySelector('.theme-doc-markdown') ||
           document.querySelector('main');
         
-        const needsInjection = (sidebar || articleContent) && (!container || 
-          (!sidebar || !sidebar.contains(container)) && 
-          (!articleContent || !articleContent.contains(container)));
+        const shouldUseArticle = shouldUseArticlePlacement(sidebar);
+        const needsInjection = (sidebar || articleContent) && (!container ||
+          (shouldUseArticle
+            ? (!articleContent || !articleContent.contains(container))
+            : (!sidebar || !sidebar.contains(container))));
         
         if (needsInjection) {
           reliableInjectCopyPageButton();
@@ -470,15 +517,13 @@ if (ExecutionEnvironment.canUseDOM) {
         document.querySelector('.theme-doc-markdown') ||
         document.querySelector('main');
 
-      const sidebarVisible =
-        sidebar &&
-        sidebar.offsetWidth > 0 &&
-        sidebar.offsetHeight > 0 &&
-        window.getComputedStyle(sidebar).display !== "none";
+      const sidebarVisible = isVisible(sidebar);
+      const shouldUseArticle = shouldUseArticlePlacement(sidebar);
 
       const buttonProperlyAttached = container && (
-        (sidebar && sidebar.contains(container)) ||
-        (articleContent && articleContent.contains(container))
+        shouldUseArticle
+          ? articleContent && articleContent.contains(container)
+          : sidebar && sidebar.contains(container)
       );
 
       if ((sidebarVisible || articleContent) && !buttonProperlyAttached) {
