@@ -20,7 +20,6 @@ Shipping in production on documentation sites across the ecosystem:
 <p>
   <a href="https://ethereum.github.io/execution-apis/" title="Ethereum Execution APIs"><img src="https://github.com/ethereum.png" width="56" height="56" alt="Ethereum"/></a>
   <a href="https://docs.sui.io" title="Sui (Mysten Labs)"><img src="https://github.com/MystenLabs.png" width="56" height="56" alt="Sui"/></a>
-  <a href="https://docs.monad.xyz" title="Monad"><img src="https://github.com/monad-developers.png" width="56" height="56" alt="Monad"/></a>
   <a href="https://dev.flare.network" title="Flare"><img src="https://github.com/flare-foundation.png" width="56" height="56" alt="Flare"/></a>
   <a href="https://docs.kaia.io" title="Kaia"><img src="https://github.com/kaiachain.png" width="56" height="56" alt="Kaia"/></a>
   <a href="https://docs.nillion.com" title="Nillion"><img src="https://github.com/NillionNetwork.png" width="56" height="56" alt="Nillion"/></a>
@@ -30,9 +29,33 @@ Shipping in production on documentation sites across the ecosystem:
   <a href="https://pptr.dev" title="Puppeteer"><img src="https://github.com/puppeteer.png" width="56" height="56" alt="Puppeteer"/></a>
 </p>
 
-Live on [Ethereum execution-apis](https://ethereum.github.io/execution-apis/), [Sui](https://docs.sui.io), [Walrus](https://docs.wal.app), [Seal](https://seal-docs.wal.app), [SuiNS](https://docs.suins.io), [Monad](https://docs.monad.xyz), [Flare](https://dev.flare.network), [Kaia](https://docs.kaia.io), [Nillion](https://docs.nillion.com), [Chronicle](https://docs.chroniclelabs.org), [Cardano](https://docs.cardano.org), [Arbitrum](https://docs.arbitrum.io), and [Puppeteer](https://pptr.dev). Using this plugin? Open a PR to add your project.
+Source-confirmed public docs sites:
 
-In review for [Oasis Protocol docs](https://github.com/oasisprotocol/docs/pull/1736), [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), and [pnpm docs](https://github.com/pnpm/pnpm.io/pull/806).
+- [1claw Docs](https://docs.1claw.xyz)
+- [Agent Layer](https://agent-layer.dev)
+- [Arbitrum](https://docs.arbitrum.io)
+- [Besu](https://besu.hyperledger.org)
+- [Cardano](https://docs.cardano.org)
+- [Chronicle](https://docs.chroniclelabs.org)
+- [Ethereum execution-apis](https://ethereum.github.io/execution-apis/)
+- [FitFileViewer](https://nick2bad4u.github.io/FitFileViewer/)
+- [Flare](https://dev.flare.network)
+- [Hashi](https://mystenlabs.github.io/hashi/design/)
+- [Kaia](https://docs.kaia.io)
+- [Nillion](https://docs.nillion.com)
+- [Ovineko](https://ovineko.com)
+- [Puppeteer](https://pptr.dev)
+- [Seal](https://seal-docs.wal.app)
+- [Sui](https://docs.sui.io)
+- [SuiNS](https://docs.suins.io)
+- [ThunderID](https://thunderid.dev)
+- [Uptime Watcher](https://nick2bad4u.github.io/Uptime-Watcher/)
+- [Walrus](https://docs.wal.app)
+- [Ai DIY](https://docs.yiw.me)
+
+Using this plugin? Open a PR to add your project.
+
+In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Dagger docs](https://github.com/dagger/dagger/pull/13045), [Ionic docs](https://github.com/ionic-team/ionic-docs/pull/4499), [Jest docs](https://github.com/jestjs/jest/pull/16179), [Logto docs](https://github.com/logto-io/docs/pull/1400), [Oasis Protocol docs](https://github.com/oasisprotocol/docs/pull/1736), [pnpm docs](https://github.com/pnpm/pnpm.io/pull/806), [Puffer Finance docs](https://github.com/PufferFinance/website-docs/pull/103), [React Native docs](https://github.com/facebook/react-native-website/pull/5085), [Redux Toolkit docs](https://github.com/reduxjs/redux-toolkit/pull/5299), [SRS docs](https://github.com/ossrs/srs-docs/pull/93), [StreamElements docs](https://github.com/StreamElements/docs/pull/86), [tRPC docs](https://github.com/trpc/trpc/pull/7379), and [Uniswap docs](https://github.com/Uniswap/docs/pull/1132).
 
 ## Why Use This Plugin?
 
