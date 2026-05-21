@@ -40,6 +40,21 @@ if (ExecutionEnvironment.canUseDOM) {
     return !sidebar || !isVisible(sidebar) || window.innerWidth <= 996;
   };
 
+  // Find the ToC sidebar element using all known selectors.
+  const findSidebar = () =>
+    document.querySelector(".theme-doc-toc-desktop") ||
+    document.querySelector(".table-of-contents") ||
+    document.querySelector('[class*="tableOfContents"]') ||
+    document.querySelector('[class*="toc"]');
+
+  // Find docs/article content for the no-ToC fallback. Avoid generic `main`
+  // so custom pages do not get a copy button just because auto injection is on.
+  const findArticleContent = () =>
+    document.querySelector("article") ||
+    document.querySelector(".theme-doc-markdown") ||
+    document.querySelector(".markdown") ||
+    document.querySelector('[class*="docItemContainer"]');
+
   // Fallback injection for pages without TOC.
   // Inject the button inline at the top of the article (right after the
   // breadcrumbs if present, otherwise as the article's first child). Keeps the
@@ -47,13 +62,7 @@ if (ExecutionEnvironment.canUseDOM) {
   // because it overlaps navbars/edit-this-page widgets.
   const injectToFallbackLocation = () => {
     // Prefer the actual <article> element since that's where breadcrumbs/h1 live.
-    const article = document.querySelector("article");
-    const articleContent =
-      article ||
-      document.querySelector(".theme-doc-markdown") ||
-      document.querySelector(".markdown") ||
-      document.querySelector('[class*="docItemContainer"]') ||
-      document.querySelector('main');
+    const articleContent = findArticleContent();
 
     if (!articleContent) {
       return; // No suitable container found
@@ -125,18 +134,14 @@ if (ExecutionEnvironment.canUseDOM) {
 
   // Fast injection for navigation (when sidebar already exists)
   const fastInjectCopyPageButton = () => {
-    const sidebar =
-      document.querySelector(".theme-doc-toc-desktop") ||
-      document.querySelector(".table-of-contents") ||
-      document.querySelector('[class*="tableOfContents"]') ||
-      document.querySelector('[class*="toc"]');
+    const sidebar = findSidebar();
 
     if (!sidebar && getPlacement() === "toc") {
       return;
     }
 
     if (shouldUseArticlePlacement(sidebar)) {
-      // If no visible sidebar, try fallback injection to main content area
+      // If no visible sidebar, try fallback injection to the article content area.
       injectToFallbackLocation();
       return;
     }
@@ -194,11 +199,7 @@ if (ExecutionEnvironment.canUseDOM) {
   const reliableInjectCopyPageButton = () => {
     injectionAttempts++;
     
-    const sidebar =
-      document.querySelector(".theme-doc-toc-desktop") ||
-      document.querySelector(".table-of-contents") ||
-      document.querySelector('[class*="tableOfContents"]') ||
-      document.querySelector('[class*="toc"]');
+    const sidebar = findSidebar();
 
     if (!sidebar && getPlacement() === "toc") {
       if (injectionAttempts < 30) {
@@ -208,13 +209,8 @@ if (ExecutionEnvironment.canUseDOM) {
     }
 
     if (shouldUseArticlePlacement(sidebar)) {
-      // Try fallback injection to main content area
-      const articleContent = 
-        document.querySelector("article") ||
-        document.querySelector(".markdown") ||
-        document.querySelector('[class*="docItemContainer"]') ||
-        document.querySelector('.theme-doc-markdown') ||
-        document.querySelector('main');
+      // Try fallback injection to the article content area.
+      const articleContent = findArticleContent();
         
       if (articleContent) {
         injectToFallbackLocation();
@@ -303,19 +299,10 @@ if (ExecutionEnvironment.canUseDOM) {
   const handleRouteChange = () => {
     // Check if button is properly attached before cleaning up
     const container = document.getElementById("copy-page-button-container");
-    const sidebar =
-      document.querySelector(".theme-doc-toc-desktop") ||
-      document.querySelector(".table-of-contents") ||
-      document.querySelector('[class*="tableOfContents"]') ||
-      document.querySelector('[class*="toc"]');
+    const sidebar = findSidebar();
     
     // Check if button is attached to sidebar or fallback location
-    const articleContent = 
-      document.querySelector("article") ||
-      document.querySelector(".markdown") ||
-      document.querySelector('[class*="docItemContainer"]') ||
-      document.querySelector('.theme-doc-markdown') ||
-      document.querySelector('main');
+    const articleContent = findArticleContent();
     
     const shouldUseArticle = shouldUseArticlePlacement(sidebar);
     const buttonProperlyAttached = container && (
@@ -346,21 +333,6 @@ if (ExecutionEnvironment.canUseDOM) {
   };
 
   let mountObserver = null;
-
-  // Find the ToC sidebar element using all known selectors.
-  const findSidebar = () =>
-    document.querySelector(".theme-doc-toc-desktop") ||
-    document.querySelector(".table-of-contents") ||
-    document.querySelector('[class*="tableOfContents"]') ||
-    document.querySelector('[class*="toc"]');
-
-  // Find the article content element (used for the no-ToC fallback).
-  const findArticleContent = () =>
-    document.querySelector("article") ||
-    document.querySelector(".theme-doc-markdown") ||
-    document.querySelector(".markdown") ||
-    document.querySelector('[class*="docItemContainer"]') ||
-    document.querySelector('main');
 
   // Reliable initialization for page refresh/initial load.
   // Uses MutationObserver as the primary detection mechanism — fires the
@@ -426,17 +398,8 @@ if (ExecutionEnvironment.canUseDOM) {
     recheckInterval = setInterval(() => {
       recheckCount++;
       const container = document.getElementById("copy-page-button-container");
-      const sidebar = document.querySelector(".theme-doc-toc-desktop") ||
-        document.querySelector(".table-of-contents") ||
-        document.querySelector('[class*="tableOfContents"]') ||
-        document.querySelector('[class*="toc"]');
-      
-      const articleContent = 
-        document.querySelector("article") ||
-        document.querySelector(".markdown") ||
-        document.querySelector('[class*="docItemContainer"]') ||
-        document.querySelector('.theme-doc-markdown') ||
-        document.querySelector('main');
+      const sidebar = findSidebar();
+      const articleContent = findArticleContent();
       
       const shouldUseArticle = shouldUseArticlePlacement(sidebar);
       const needsInjection = (sidebar || articleContent) && (!container ||
@@ -475,17 +438,8 @@ if (ExecutionEnvironment.canUseDOM) {
     if (!document.hidden) {
       setTimeout(() => {
         const container = document.getElementById("copy-page-button-container");
-        const sidebar = document.querySelector(".theme-doc-toc-desktop") ||
-          document.querySelector(".table-of-contents") ||
-          document.querySelector('[class*="tableOfContents"]') ||
-          document.querySelector('[class*="toc"]');
-        
-        const articleContent = 
-          document.querySelector("article") ||
-          document.querySelector(".markdown") ||
-          document.querySelector('[class*="docItemContainer"]') ||
-          document.querySelector('.theme-doc-markdown') ||
-          document.querySelector('main');
+        const sidebar = findSidebar();
+        const articleContent = findArticleContent();
         
         const shouldUseArticle = shouldUseArticlePlacement(sidebar);
         const needsInjection = (sidebar || articleContent) && (!container ||
@@ -504,18 +458,8 @@ if (ExecutionEnvironment.canUseDOM) {
   window.addEventListener("resize", () => {
     setTimeout(() => {
       const container = document.getElementById("copy-page-button-container");
-      const sidebar =
-        document.querySelector(".theme-doc-toc-desktop") ||
-        document.querySelector(".table-of-contents") ||
-        document.querySelector('[class*="tableOfContents"]') ||
-        document.querySelector('[class*="toc"]');
-
-      const articleContent = 
-        document.querySelector("article") ||
-        document.querySelector(".markdown") ||
-        document.querySelector('[class*="docItemContainer"]') ||
-        document.querySelector('.theme-doc-markdown') ||
-        document.querySelector('main');
+      const sidebar = findSidebar();
+      const articleContent = findArticleContent();
 
       const sidebarVisible = isVisible(sidebar);
       const shouldUseArticle = shouldUseArticlePlacement(sidebar);

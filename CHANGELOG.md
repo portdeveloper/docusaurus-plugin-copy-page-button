@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 0.6.1 — 2026-05-21
+
+### Fixed
+
+- Auto placement no longer injects a copy button into generic custom pages that only expose a `main` element. The no-ToC fallback now targets docs/article containers only.
+
 ## 0.6.0 — 2026-05-21
 
 ### Added
