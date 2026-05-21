@@ -27,9 +27,12 @@ Shipping in production on documentation sites across the ecosystem:
   <a href="https://docs.chroniclelabs.org" title="Chronicle"><img src="https://github.com/chronicleprotocol.png" width="56" height="56" alt="Chronicle"/></a>
   <a href="https://docs.cardano.org" title="Cardano"><img src="https://github.com/cardano-foundation.png" width="56" height="56" alt="Cardano"/></a>
   <a href="https://docs.arbitrum.io" title="Arbitrum"><img src="https://github.com/OffchainLabs.png" width="56" height="56" alt="Arbitrum"/></a>
+  <a href="https://pptr.dev" title="Puppeteer"><img src="https://github.com/puppeteer.png" width="56" height="56" alt="Puppeteer"/></a>
 </p>
 
-Live on [Ethereum execution-apis](https://ethereum.github.io/execution-apis/), [Sui](https://docs.sui.io), [Walrus](https://docs.wal.app), [Seal](https://seal-docs.wal.app), [SuiNS](https://docs.suins.io), [Monad](https://docs.monad.xyz), [Flare](https://dev.flare.network), [Kaia](https://docs.kaia.io), [Nillion](https://docs.nillion.com), [Chronicle](https://docs.chroniclelabs.org), [Cardano](https://docs.cardano.org), and [Arbitrum](https://docs.arbitrum.io). Using this plugin? Open a PR to add your project.
+Live on [Ethereum execution-apis](https://ethereum.github.io/execution-apis/), [Sui](https://docs.sui.io), [Walrus](https://docs.wal.app), [Seal](https://seal-docs.wal.app), [SuiNS](https://docs.suins.io), [Monad](https://docs.monad.xyz), [Flare](https://dev.flare.network), [Kaia](https://docs.kaia.io), [Nillion](https://docs.nillion.com), [Chronicle](https://docs.chroniclelabs.org), [Cardano](https://docs.cardano.org), [Arbitrum](https://docs.arbitrum.io), and [Puppeteer](https://pptr.dev). Using this plugin? Open a PR to add your project.
+
+In review for [Oasis Protocol docs](https://github.com/oasisprotocol/docs/pull/1736), [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), and [pnpm docs](https://github.com/pnpm/pnpm.io/pull/806).
 
 ## Why Use This Plugin?
 
