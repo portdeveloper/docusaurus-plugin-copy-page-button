@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 0.6.2 — 2026-05-22
+
+### Fixed
+
+- Dropdown positioning is calculated before the menu first renders, preventing the first interaction from briefly showing the menu in the viewport's top-left corner.
+
 ## 0.6.1 — 2026-05-21
 
 ### Fixed

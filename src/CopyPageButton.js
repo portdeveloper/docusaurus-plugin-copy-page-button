@@ -8,6 +8,9 @@ const {
 const DEFAULT_ACTIONS = ['copy', 'view', 'chatgpt', 'claude', 'perplexity', 'gemini'];
 const DEFAULT_MCP_ACTIONS = ['mcp-copy', 'mcp-cursor', 'mcp-vscode'];
 const POSITIONING_PROPS = ['position', 'top', 'right', 'bottom', 'left', 'zIndex', 'transform'];
+const DROPDOWN_WIDTH = 300;
+const DROPDOWN_OFFSET = 8;
+const VIEWPORT_PADDING = 8;
 
 // Utility function to merge custom styles with default classes
 const mergeStyles = (defaultClassName, customStyleConfig = {}) => {
@@ -39,6 +42,19 @@ const separatePositioningStyles = (styleObject = {}) => {
   return { positioning, nonPositioning };
 };
 
+const getDropdownPosition = (buttonElement) => {
+  const rect = buttonElement.getBoundingClientRect();
+  const maxLeft = window.innerWidth - DROPDOWN_WIDTH - VIEWPORT_PADDING;
+
+  return {
+    top: rect.bottom + DROPDOWN_OFFSET,
+    left: Math.max(
+      VIEWPORT_PADDING,
+      Math.min(rect.right - DROPDOWN_WIDTH, maxLeft)
+    ),
+  };
+};
+
 export default function CopyPageButton({
   customStyles = {},
   enabledActions,
@@ -47,7 +63,7 @@ export default function CopyPageButton({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [pageContent, setPageContent] = useState("");
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [dropdownPosition, setDropdownPosition] = useState(null);
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
 
@@ -57,6 +73,30 @@ export default function CopyPageButton({
   const dropdownStyleConfig = customStyles.dropdown || {};
   const dropdownItemStyleConfig = customStyles.dropdownItem || {};
 
+  const updateDropdownPosition = () => {
+    if (typeof window === 'undefined' || !buttonRef.current) {
+      return false;
+    }
+
+    setDropdownPosition(getDropdownPosition(buttonRef.current));
+    return true;
+  };
+
+  const closeDropdown = () => {
+    setIsOpen(false);
+    setDropdownPosition(null);
+  };
+
+  const handleButtonClick = () => {
+    if (isOpen) {
+      closeDropdown();
+      return;
+    }
+
+    updateDropdownPosition();
+    setIsOpen(true);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -65,7 +105,7 @@ export default function CopyPageButton({
         buttonRef.current &&
         !buttonRef.current.contains(event.target)
       ) {
-        setIsOpen(false);
+        closeDropdown();
       }
     };
 
@@ -79,19 +119,19 @@ export default function CopyPageButton({
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      const dropdownWidth = 300;
-      const viewportPadding = 8;
-      const maxLeft = window.innerWidth - dropdownWidth - viewportPadding;
-      setDropdownPosition({
-        top: rect.bottom + 8,
-        left: Math.max(
-          viewportPadding,
-          Math.min(rect.right - dropdownWidth, maxLeft)
-        ),
-      });
+    if (!isOpen || typeof window === 'undefined') {
+      return undefined;
     }
+
+    updateDropdownPosition();
+
+    window.addEventListener('resize', updateDropdownPosition);
+    window.addEventListener('scroll', updateDropdownPosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updateDropdownPosition);
+      window.removeEventListener('scroll', updateDropdownPosition, true);
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -470,7 +510,7 @@ Please provide a clear summary and help me understand the key concepts covered i
         <button
           className={buttonProps.className}
           style={buttonProps.style}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={handleButtonClick}
           aria-expanded={isOpen}
           aria-haspopup="true"
           ref={buttonRef}
@@ -503,7 +543,7 @@ Please provide a clear summary and help me understand the key concepts covered i
         </button>
       </div>
 
-      {isOpen && (
+      {isOpen && dropdownPosition && (
         <div
           className={dropdownProps.className}
           style={{
@@ -522,7 +562,7 @@ Please provide a clear summary and help me understand the key concepts covered i
               style={dropdownItemProps.style}
               onClick={() => {
                 item.action();
-                setIsOpen(false);
+                closeDropdown();
               }}
             >
               {item.icon}
