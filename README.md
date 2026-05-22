@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Mentioned in Awesome Docusaurus](https://awesome.re/mentioned-badge.svg)](https://github.com/webbertakken/awesome-docusaurus)
 
-**[Live Demo](https://portdeveloper.github.io/copy-page-button-showcase/)**
+**[Live Demo](https://portdeveloper.github.io/copy-page-button-showcase/)** · **[Read the story](https://portdeveloper.github.io/articles/how-a-button-i-built-for-one-docs-site-ended-up-on-twenty.html)**
 
 <img src="https://github.com/user-attachments/assets/8e7351ba-0cab-489c-bbcf-543603c3bcf1" alt="Docusaurus Copy Page Button Plugin Preview" width="418" height="448" />
 
