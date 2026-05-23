@@ -17,7 +17,8 @@ type StyleConfig = {
 };
 
 type McpServerConfig = {
-  name: string;
+  name?: string;
+  config?: Record<string, unknown>;
   url?: string;
   command?: string;
   args?: string[];
@@ -25,6 +26,8 @@ type McpServerConfig = {
   type?: string;
   [key: string]: unknown;
 };
+
+type McpServerOption = string | McpServerConfig;
 
 export type CopyPageButtonProps = {
   customStyles?: {
@@ -35,7 +38,7 @@ export type CopyPageButtonProps = {
   };
   enabledActions?: ActionId[];
   generateMarkdownRoutes?: boolean;
-  mcpServer?: McpServerConfig | null;
+  mcpServer?: McpServerOption | null;
 };
 
 declare const CopyPageButton: ComponentType<CopyPageButtonProps>;

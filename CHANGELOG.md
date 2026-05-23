@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## Unreleased
+
+### Fixed
+
+- TypeScript declarations now accept all supported `mcpServer` forms, including URL strings and objects that rely on the default server name.
+
 ## 0.6.2 — 2026-05-22
 
 ### Fixed

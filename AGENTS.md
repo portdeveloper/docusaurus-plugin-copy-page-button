@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents when working with code in this repository.
 
 ## Project Overview
 
@@ -46,6 +46,17 @@ Since this is a pure Docusaurus plugin with no build step:
 - No npm scripts for building, testing, or linting
 - Changes to source files are immediately usable
 - Test by linking the package locally and using in a Docusaurus project
+
+## Documentation Outreach PRs
+
+Before opening a PR to add this plugin to another documentation site, screen the target repository's base branch for overlapping features.
+
+Required checks:
+- Search for existing page-level copy or AI actions, including `CopyPageButton`, `DocActionsDropdown`, `copy as markdown`, `copy page`, `Open in ChatGPT`, `Open in Claude`, `Open in Gemini`, and `docusaurus-plugin-copy-page-button`.
+- Search for adjacent LLM documentation export features, including `llms.txt`, `llms-full.txt`, `docusaurus-plugin-llms`, `markdown-export`, and custom `llm` or `llms` plugins.
+- Check whether this account already opened a PR in that repository with `docusaurus-plugin-copy-page-button`.
+
+Do not open a PR when the site already has an equivalent page-level copy/open-in-AI UI. If the site only has `llms.txt` or static markdown exports, the PR may still be useful, but the PR body must explicitly mention the existing feature and explain that this plugin adds a page-level copy/open UI instead of a corpus export.
 
 ### Local Testing Process
 1. `npm link` in this repository

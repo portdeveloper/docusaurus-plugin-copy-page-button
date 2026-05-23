@@ -250,6 +250,14 @@ module.exports = {
 
 The plugin can copy the MCP JSON config and generate install links for Cursor and VS Code. Cursor install links follow Cursor's MCP deeplink format, and VS Code install links use `vscode:mcp/install`.
 
+For URL-only MCP servers, you can also pass the URL string directly:
+
+```js
+mcpServer: "https://docs.example.com/mcp"
+```
+
+The shorthand uses `docs` as the server name.
+
 ### Custom Styling
 
 You can customize the appearance of the copy page button by passing a `customStyles` option:

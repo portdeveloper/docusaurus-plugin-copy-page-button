@@ -17,7 +17,8 @@ type StyleConfig = {
 };
 
 type McpServerConfig = {
-  name: string;
+  name?: string;
+  config?: Record<string, unknown>;
   url?: string;
   command?: string;
   args?: string[];
@@ -25,6 +26,8 @@ type McpServerConfig = {
   type?: string;
   [key: string]: unknown;
 };
+
+type McpServerOption = string | McpServerConfig;
 
 export type CopyPageButtonPluginOptions = {
   customStyles?: {
@@ -37,7 +40,7 @@ export type CopyPageButtonPluginOptions = {
   generateMarkdownRoutes?: boolean;
   injectButton?: boolean;
   placement?: 'auto' | 'toc' | 'article';
-  mcpServer?: McpServerConfig | null;
+  mcpServer?: McpServerOption | null;
 };
 
 export default function copyPageButtonPlugin(
