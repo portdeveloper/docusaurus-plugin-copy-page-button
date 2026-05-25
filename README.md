@@ -57,7 +57,7 @@ Source-confirmed public docs sites:
 
 Using this plugin? Open a PR to add your project.
 
-In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Dagger docs](https://github.com/dagger/dagger/pull/13045), [Ionic docs](https://github.com/ionic-team/ionic-docs/pull/4499), [Jest docs](https://github.com/jestjs/jest/pull/16179), [Logto docs](https://github.com/logto-io/docs/pull/1400), [Oasis Protocol docs](https://github.com/oasisprotocol/docs/pull/1736), [pnpm docs](https://github.com/pnpm/pnpm.io/pull/806), [Puffer Finance docs](https://github.com/PufferFinance/website-docs/pull/103), [Redux Toolkit docs](https://github.com/reduxjs/redux-toolkit/pull/5299), [SRS docs](https://github.com/ossrs/srs-docs/pull/93), [StreamElements docs](https://github.com/StreamElements/docs/pull/86), [tRPC docs](https://github.com/trpc/trpc/pull/7379), and [Uniswap docs](https://github.com/Uniswap/docs/pull/1132).
+In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Dagger docs](https://github.com/dagger/dagger/pull/13045), [Ionic docs](https://github.com/ionic-team/ionic-docs/pull/4499), [Jest docs](https://github.com/jestjs/jest/pull/16179), [Logto docs](https://github.com/logto-io/docs/pull/1400), [pnpm docs](https://github.com/pnpm/pnpm.io/pull/806), [Puffer Finance docs](https://github.com/PufferFinance/website-docs/pull/103), [Redux Toolkit docs](https://github.com/reduxjs/redux-toolkit/pull/5299), [SRS docs](https://github.com/ossrs/srs-docs/pull/93), [StreamElements docs](https://github.com/StreamElements/docs/pull/86), [tRPC docs](https://github.com/trpc/trpc/pull/7379), and [Uniswap docs](https://github.com/Uniswap/docs/pull/1132).
 
 ## Why Use This Plugin?
 
@@ -251,6 +251,14 @@ module.exports = {
 ```
 
 The plugin can copy the MCP JSON config and generate install links for Cursor and VS Code. Cursor install links follow Cursor's MCP deeplink format, and VS Code install links use `vscode:mcp/install`.
+
+For URL-only MCP servers, you can also pass the URL string directly:
+
+```js
+mcpServer: "https://docs.example.com/mcp"
+```
+
+The shorthand uses `docs` as the server name.
 
 ### Custom Styling
 
