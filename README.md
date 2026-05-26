@@ -29,6 +29,7 @@ Shipping in production on documentation sites across the ecosystem:
   <a href="https://pptr.dev" title="Puppeteer"><img src="https://github.com/puppeteer.png" width="56" height="56" alt="Puppeteer"/></a>
   <a href="https://reactnative.dev" title="React Native"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/3840px-React-icon.svg.png" width="56" height="56" alt="React Native"/></a>
   <a href="https://developer.playcanvas.com" title="PlayCanvas"><img src="https://github.com/playcanvas.png" width="56" height="56" alt="PlayCanvas"/></a>
+  <a href="https://pnpm.io" title="pnpm"><img src="https://github.com/pnpm.png" width="56" height="56" alt="pnpm"/></a>
 </p>
 
 Source-confirmed public docs sites:
@@ -47,6 +48,7 @@ Source-confirmed public docs sites:
 - [Nillion](https://docs.nillion.com)
 - [Ovineko](https://ovineko.com)
 - [PlayCanvas](https://developer.playcanvas.com)
+- [pnpm](https://pnpm.io)
 - [Puppeteer](https://pptr.dev)
 - [React Native](https://reactnative.dev)
 - [Seal](https://seal-docs.wal.app)
@@ -59,7 +61,7 @@ Source-confirmed public docs sites:
 
 Using this plugin? Open a PR to add your project.
 
-In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Dagger docs](https://github.com/dagger/dagger/pull/13045), [Ionic docs](https://github.com/ionic-team/ionic-docs/pull/4499), [Jest docs](https://github.com/jestjs/jest/pull/16179), [Lexical docs](https://github.com/facebook/lexical/pull/8568), [Logto docs](https://github.com/logto-io/docs/pull/1400), [pnpm docs](https://github.com/pnpm/pnpm.io/pull/806), [Puffer Finance docs](https://github.com/PufferFinance/website-docs/pull/103), [Redux Toolkit docs](https://github.com/reduxjs/redux-toolkit/pull/5299), [Seeed Studio Wiki](https://github.com/Seeed-Studio/wiki-documents/pull/4682), [SRS docs](https://github.com/ossrs/srs-docs/pull/93), [StreamElements docs](https://github.com/StreamElements/docs/pull/86), [tRPC docs](https://github.com/trpc/trpc/pull/7379), and [Uniswap docs](https://github.com/Uniswap/docs/pull/1132).
+In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Dagger docs](https://github.com/dagger/dagger/pull/13045), [Ionic docs](https://github.com/ionic-team/ionic-docs/pull/4499), [Jest docs](https://github.com/jestjs/jest/pull/16179), [Lexical docs](https://github.com/facebook/lexical/pull/8568), [Logto docs](https://github.com/logto-io/docs/pull/1400), [Puffer Finance docs](https://github.com/PufferFinance/website-docs/pull/103), [Redux Toolkit docs](https://github.com/reduxjs/redux-toolkit/pull/5299), [Seeed Studio Wiki](https://github.com/Seeed-Studio/wiki-documents/pull/4682), [SRS docs](https://github.com/ossrs/srs-docs/pull/93), [StreamElements docs](https://github.com/StreamElements/docs/pull/86), [tRPC docs](https://github.com/trpc/trpc/pull/7379), and [Uniswap docs](https://github.com/Uniswap/docs/pull/1132).
 
 ## Why Use This Plugin?
 
