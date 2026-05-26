@@ -17,13 +17,34 @@ type StyleConfig = {
 };
 
 type McpServerConfig = {
-  name: string;
+  name?: string;
+  config?: Record<string, unknown>;
   url?: string;
   command?: string;
   args?: string[];
   env?: Record<string, string>;
   type?: string;
   [key: string]: unknown;
+};
+
+type McpServerOption = string | McpServerConfig;
+
+type LabelGroup = {
+  title?: string;
+  description?: string;
+};
+
+export type CopyPageButtonLabels = {
+  button?: {label?: string};
+  copy?: LabelGroup;
+  view?: LabelGroup;
+  chatgpt?: LabelGroup;
+  claude?: LabelGroup;
+  perplexity?: LabelGroup;
+  gemini?: LabelGroup;
+  mcpCopy?: LabelGroup;
+  mcpCursor?: LabelGroup;
+  mcpVscode?: LabelGroup;
 };
 
 export type CopyPageButtonProps = {
@@ -35,7 +56,8 @@ export type CopyPageButtonProps = {
   };
   enabledActions?: ActionId[];
   generateMarkdownRoutes?: boolean;
-  mcpServer?: McpServerConfig | null;
+  mcpServer?: McpServerOption | null;
+  labels?: CopyPageButtonLabels;
 };
 
 declare const CopyPageButton: ComponentType<CopyPageButtonProps>;

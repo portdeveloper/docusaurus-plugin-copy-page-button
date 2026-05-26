@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { translate } from "@docusaurus/Translate";
 import styles from "./styles.module.css";
 const {
   extractPageMarkdownFromDocument,
@@ -59,8 +60,20 @@ export default function CopyPageButton({
   customStyles = {},
   enabledActions,
   generateMarkdownRoutes = false,
-  mcpServer = null
+  mcpServer = null,
+  labels = {}
 }) {
+  const t = (group, field, defaultMessage) => {
+    const override = labels?.[group]?.[field];
+    if (typeof override === "string") {
+      return override;
+    }
+    return translate({
+      id: `copyPageButton.${group}.${field}`,
+      message: defaultMessage,
+    });
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [pageContent, setPageContent] = useState("");
   const [dropdownPosition, setDropdownPosition] = useState(null);
@@ -294,8 +307,8 @@ Please provide a clear summary and help me understand the key concepts covered i
   const allDropdownItems = [
     {
       id: "copy",
-      title: "Copy page",
-      description: "Copy the page as Markdown for LLMs",
+      title: t("copy", "title", "Copy page"),
+      description: t("copy", "description", "Copy the page as Markdown for LLMs"),
       icon: (
         <svg
           width="16"
@@ -313,8 +326,8 @@ Please provide a clear summary and help me understand the key concepts covered i
     },
     {
       id: "view",
-      title: "View as Markdown",
-      description: "View this page as plain text",
+      title: t("view", "title", "View as Markdown"),
+      description: t("view", "description", "View this page as plain text"),
       icon: (
         <svg
           width="16"
@@ -334,8 +347,8 @@ Please provide a clear summary and help me understand the key concepts covered i
     },
     {
       id: "chatgpt",
-      title: "Open in ChatGPT",
-      description: "Ask questions about this page",
+      title: t("chatgpt", "title", "Open in ChatGPT"),
+      description: t("chatgpt", "description", "Ask questions about this page"),
       icon: (
         <svg
           width="16"
@@ -355,8 +368,8 @@ Please provide a clear summary and help me understand the key concepts covered i
     },
     {
       id: "claude",
-      title: "Open in Claude",
-      description: "Ask questions about this page",
+      title: t("claude", "title", "Open in Claude"),
+      description: t("claude", "description", "Ask questions about this page"),
       icon: (
         <svg
           width="16"
@@ -373,8 +386,8 @@ Please provide a clear summary and help me understand the key concepts covered i
     },
     {
       id: "perplexity",
-      title: "Open in Perplexity",
-      description: "Ask questions about this page",
+      title: t("perplexity", "title", "Open in Perplexity"),
+      description: t("perplexity", "description", "Ask questions about this page"),
       icon: (
         <svg
           width="16"
@@ -390,8 +403,8 @@ Please provide a clear summary and help me understand the key concepts covered i
     },
     {
       id: "gemini",
-      title: "Open in Gemini",
-      description: "Ask questions about this page",
+      title: t("gemini", "title", "Open in Gemini"),
+      description: t("gemini", "description", "Ask questions about this page"),
       icon: (
         <svg
           width="16"
@@ -411,8 +424,8 @@ Please provide a clear summary and help me understand the key concepts covered i
     ...(mcpConfig ? [
       {
         id: "mcp-copy",
-        title: "Copy MCP config",
-        description: "Copy MCP server JSON",
+        title: t("mcpCopy", "title", "Copy MCP config"),
+        description: t("mcpCopy", "description", "Copy MCP server JSON"),
         icon: (
           <svg
             width="16"
@@ -432,8 +445,8 @@ Please provide a clear summary and help me understand the key concepts covered i
       },
       {
         id: "mcp-cursor",
-        title: "Install in Cursor",
-        description: "Open Cursor MCP installer",
+        title: t("mcpCursor", "title", "Install in Cursor"),
+        description: t("mcpCursor", "description", "Open Cursor MCP installer"),
         icon: (
           <svg
             width="16"
@@ -454,8 +467,8 @@ Please provide a clear summary and help me understand the key concepts covered i
       },
       {
         id: "mcp-vscode",
-        title: "Install in VS Code",
-        description: "Open VS Code MCP installer",
+        title: t("mcpVscode", "title", "Install in VS Code"),
+        description: t("mcpVscode", "description", "Open VS Code MCP installer"),
         icon: (
           <svg
             width="16"
@@ -526,7 +539,7 @@ Please provide a clear summary and help me understand the key concepts covered i
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
-          <span className={styles.copyPageText}>Copy page</span>
+          <span className={styles.copyPageText}>{t("button", "label", "Copy page")}</span>
           <svg
             width="12"
             height="12"

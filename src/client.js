@@ -128,7 +128,8 @@ if (ExecutionEnvironment.canUseDOM) {
       customStyles: renderOptions.customStyles,
       enabledActions: renderOptions.enabledActions,
       generateMarkdownRoutes: renderOptions.generateMarkdownRoutes,
-      mcpServer: renderOptions.mcpServer
+      mcpServer: renderOptions.mcpServer,
+      labels: renderOptions.labels
     }));
   };
 
@@ -191,7 +192,8 @@ if (ExecutionEnvironment.canUseDOM) {
       customStyles: renderOptions.customStyles,
       enabledActions: renderOptions.enabledActions,
       generateMarkdownRoutes: renderOptions.generateMarkdownRoutes,
-      mcpServer: renderOptions.mcpServer
+      mcpServer: renderOptions.mcpServer,
+      labels: renderOptions.labels
     }));
   };
 
@@ -268,7 +270,8 @@ if (ExecutionEnvironment.canUseDOM) {
       customStyles: renderOptions.customStyles,
       enabledActions: renderOptions.enabledActions,
       generateMarkdownRoutes: renderOptions.generateMarkdownRoutes,
-      mcpServer: renderOptions.mcpServer
+      mcpServer: renderOptions.mcpServer,
+      labels: renderOptions.labels
     }));
 
     // Reset injection attempts on successful injection

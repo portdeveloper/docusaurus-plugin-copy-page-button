@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## Unreleased
+
+## 0.7.0 — 2026-05-26
+
+### Added
+
+- Localization support with two override paths. (1) New `labels` plugin option lets sites pass title/description strings directly in `docusaurus.config.js` — works for any site, including one-site-per-language setups where each site has its own `defaultLocale`. (2) All visible labels and descriptions ("Copy page", "View as Markdown", "Open in ChatGPT", etc.) also go through Docusaurus's `translate()`, so standard multi-locale sites can override them per locale via `i18n/<locale>/code.json`. Default English text is unchanged. See README "Localization" section for the full ID list.
+
+### Fixed
+
+- TypeScript declarations now accept all supported `mcpServer` forms, including URL strings and objects that rely on the default server name.
+
 ## 0.6.2 — 2026-05-22
 
 ### Fixed

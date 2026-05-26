@@ -368,6 +368,76 @@ module.exports = {
 };
 ```
 
+### Localization
+
+Two ways to translate the visible labels, each suited to a different site shape.
+
+#### Option A — `labels` plugin option (works for any site, including monolingual or one-site-per-language setups)
+
+Pass label overrides directly in your `docusaurus.config.js`. The `labels` object wins over everything else when set:
+
+```js
+module.exports = {
+  plugins: [
+    [
+      "docusaurus-plugin-copy-page-button",
+      {
+        labels: {
+          button: { label: "ページをコピー" },
+          copy: {
+            title: "ページをコピー",
+            description: "このページを Markdown としてコピー",
+          },
+          view: { title: "Markdown で表示" },
+          chatgpt: { title: "ChatGPT で開く" },
+          claude: { title: "Claude で開く" },
+          perplexity: { title: "Perplexity で開く" },
+          gemini: { title: "Gemini で開く" },
+        },
+      },
+    ],
+  ],
+};
+```
+
+Override only the keys you need — anything you leave out falls back to the default English (or to an `i18n/<locale>/code.json` entry; see Option B).
+
+This is the right option when each language has its own Docusaurus site (each with its own `defaultLocale`), because Docusaurus's `<Translate>` machinery only applies to non-default locales and `labels` sidesteps that constraint.
+
+#### Option B — Docusaurus i18n (standard multi-locale sites)
+
+For a site with `i18n: { defaultLocale, locales }` covering multiple locales, all visible strings also flow through Docusaurus's `translate()` calls. Add the translation IDs to `i18n/<locale>/code.json` for each non-default locale:
+
+```json
+{
+  "copyPageButton.button.label": { "message": "コピー" },
+  "copyPageButton.copy.title": { "message": "ページをコピー" },
+  "copyPageButton.copy.description": { "message": "このページを Markdown としてコピー" },
+  "copyPageButton.view.title": { "message": "Markdown で表示" },
+  "copyPageButton.chatgpt.title": { "message": "ChatGPT で開く" },
+  "copyPageButton.claude.title": { "message": "Claude で開く" },
+  "copyPageButton.perplexity.title": { "message": "Perplexity で開く" },
+  "copyPageButton.gemini.title": { "message": "Gemini で開く" }
+}
+```
+
+> **Note:** `docusaurus write-translations` only scans your site's source code, not `node_modules`. The plugin's IDs won't be auto-extracted; copy them in manually from the table below.
+
+Available translation IDs:
+
+| ID | Default English |
+|---|---|
+| `copyPageButton.button.label` | `Copy page` (visible button text) |
+| `copyPageButton.copy.title` / `.description` | `Copy page` / `Copy the page as Markdown for LLMs` |
+| `copyPageButton.view.title` / `.description` | `View as Markdown` / `View this page as plain text` |
+| `copyPageButton.chatgpt.title` / `.description` | `Open in ChatGPT` / `Ask questions about this page` |
+| `copyPageButton.claude.title` / `.description` | `Open in Claude` / `Ask questions about this page` |
+| `copyPageButton.perplexity.title` / `.description` | `Open in Perplexity` / `Ask questions about this page` |
+| `copyPageButton.gemini.title` / `.description` | `Open in Gemini` / `Ask questions about this page` |
+| `copyPageButton.mcpCopy.title` / `.description` | `Copy MCP config` / `Copy MCP server JSON` |
+| `copyPageButton.mcpCursor.title` / `.description` | `Install in Cursor` / `Open Cursor MCP installer` |
+| `copyPageButton.mcpVscode.title` / `.description` | `Install in VS Code` / `Open VS Code MCP installer` |
+
 ## Markdown URL routes
 
 Set `generateMarkdownRoutes: true` to emit a plain-markdown URL for each generated documentation page:
