@@ -26,6 +26,7 @@ Shipping in production on documentation sites across the ecosystem:
   <a href="https://ethereum.github.io/execution-apis/" title="Ethereum Execution APIs"><img src="https://github.com/ethereum.png" width="56" height="56" alt="Ethereum"/></a>
   <a href="https://docs.arbitrum.io" title="Arbitrum"><img src="https://github.com/OffchainLabs.png" width="56" height="56" alt="Arbitrum"/></a>
   <a href="https://docs.cardano.org" title="Cardano"><img src="https://github.com/cardano-foundation.png" width="56" height="56" alt="Cardano"/></a>
+  <a href="https://wiki.seeedstudio.com" title="Seeed Studio Wiki"><img src="https://github.com/Seeed-Studio.png" width="56" height="56" alt="Seeed Studio"/></a>
   <a href="https://docs.kaia.io" title="Kaia"><img src="https://github.com/kaiachain.png" width="56" height="56" alt="Kaia"/></a>
   <a href="https://docs.chroniclelabs.org" title="Chronicle"><img src="https://github.com/chronicleprotocol.png" width="56" height="56" alt="Chronicle"/></a>
   <a href="https://dev.flare.network" title="Flare"><img src="https://github.com/flare-foundation.png" width="56" height="56" alt="Flare"/></a>
@@ -45,6 +46,7 @@ Source-confirmed public docs sites:
 - [Cardano](https://docs.cardano.org)
 - [Seal](https://seal-docs.wal.app)
 - [Walrus](https://docs.wal.app)
+- [Seeed Studio Wiki](https://wiki.seeedstudio.com)
 - [SuiNS](https://docs.suins.io)
 - [Kaia](https://docs.kaia.io)
 - [Chronicle](https://docs.chroniclelabs.org)
@@ -61,7 +63,7 @@ Source-confirmed public docs sites:
 
 Using this plugin? Open a PR to add your project.
 
-In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Dagger docs](https://github.com/dagger/dagger/pull/13045), [Ionic docs](https://github.com/ionic-team/ionic-docs/pull/4499), [Jest docs](https://github.com/jestjs/jest/pull/16179), [Lexical docs](https://github.com/facebook/lexical/pull/8568), [Logto docs](https://github.com/logto-io/docs/pull/1400), [Puffer Finance docs](https://github.com/PufferFinance/website-docs/pull/103), [Redux Toolkit docs](https://github.com/reduxjs/redux-toolkit/pull/5299), [Seeed Studio Wiki](https://github.com/Seeed-Studio/wiki-documents/pull/4682), [SRS docs](https://github.com/ossrs/srs-docs/pull/93), [StreamElements docs](https://github.com/StreamElements/docs/pull/86), [tRPC docs](https://github.com/trpc/trpc/pull/7379), and [Uniswap docs](https://github.com/Uniswap/docs/pull/1132).
+In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Dagger docs](https://github.com/dagger/dagger/pull/13045), [Ionic docs](https://github.com/ionic-team/ionic-docs/pull/4499), [Jest docs](https://github.com/jestjs/jest/pull/16179), [Logto docs](https://github.com/logto-io/docs/pull/1400), [Puffer Finance docs](https://github.com/PufferFinance/website-docs/pull/103), [Redux Toolkit docs](https://github.com/reduxjs/redux-toolkit/pull/5299), [SRS docs](https://github.com/ossrs/srs-docs/pull/93), [StreamElements docs](https://github.com/StreamElements/docs/pull/86), [tRPC docs](https://github.com/trpc/trpc/pull/7379), and [Uniswap docs](https://github.com/Uniswap/docs/pull/1132).
 
 ## Why Use This Plugin?
 
