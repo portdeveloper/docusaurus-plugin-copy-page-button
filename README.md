@@ -18,46 +18,46 @@ A lightweight Docusaurus plugin that adds a "Copy page" button to your documenta
 Shipping in production on documentation sites across the ecosystem:
 
 <p>
-  <a href="https://ethereum.github.io/execution-apis/" title="Ethereum Execution APIs"><img src="https://github.com/ethereum.png" width="56" height="56" alt="Ethereum"/></a>
-  <a href="https://docs.sui.io" title="Sui (Mysten Labs)"><img src="https://github.com/MystenLabs.png" width="56" height="56" alt="Sui"/></a>
-  <a href="https://dev.flare.network" title="Flare"><img src="https://github.com/flare-foundation.png" width="56" height="56" alt="Flare"/></a>
-  <a href="https://docs.kaia.io" title="Kaia"><img src="https://github.com/kaiachain.png" width="56" height="56" alt="Kaia"/></a>
-  <a href="https://docs.nillion.com" title="Nillion"><img src="https://github.com/NillionNetwork.png" width="56" height="56" alt="Nillion"/></a>
-  <a href="https://docs.chroniclelabs.org" title="Chronicle"><img src="https://github.com/chronicleprotocol.png" width="56" height="56" alt="Chronicle"/></a>
-  <a href="https://docs.cardano.org" title="Cardano"><img src="https://github.com/cardano-foundation.png" width="56" height="56" alt="Cardano"/></a>
-  <a href="https://docs.arbitrum.io" title="Arbitrum"><img src="https://github.com/OffchainLabs.png" width="56" height="56" alt="Arbitrum"/></a>
-  <a href="https://pptr.dev" title="Puppeteer"><img src="https://github.com/puppeteer.png" width="56" height="56" alt="Puppeteer"/></a>
   <a href="https://reactnative.dev" title="React Native"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/3840px-React-icon.svg.png" width="56" height="56" alt="React Native"/></a>
-  <a href="https://developer.playcanvas.com" title="PlayCanvas"><img src="https://github.com/playcanvas.png" width="56" height="56" alt="PlayCanvas"/></a>
+  <a href="https://pptr.dev" title="Puppeteer"><img src="https://github.com/puppeteer.png" width="56" height="56" alt="Puppeteer"/></a>
   <a href="https://pnpm.io" title="pnpm"><img src="https://github.com/pnpm.png" width="56" height="56" alt="pnpm"/></a>
+  <a href="https://developer.playcanvas.com" title="PlayCanvas"><img src="https://github.com/playcanvas.png" width="56" height="56" alt="PlayCanvas"/></a>
+  <a href="https://docs.sui.io" title="Sui (Mysten Labs)"><img src="https://github.com/MystenLabs.png" width="56" height="56" alt="Sui"/></a>
+  <a href="https://ethereum.github.io/execution-apis/" title="Ethereum Execution APIs"><img src="https://github.com/ethereum.png" width="56" height="56" alt="Ethereum"/></a>
+  <a href="https://docs.arbitrum.io" title="Arbitrum"><img src="https://github.com/OffchainLabs.png" width="56" height="56" alt="Arbitrum"/></a>
+  <a href="https://docs.cardano.org" title="Cardano"><img src="https://github.com/cardano-foundation.png" width="56" height="56" alt="Cardano"/></a>
+  <a href="https://docs.kaia.io" title="Kaia"><img src="https://github.com/kaiachain.png" width="56" height="56" alt="Kaia"/></a>
+  <a href="https://docs.chroniclelabs.org" title="Chronicle"><img src="https://github.com/chronicleprotocol.png" width="56" height="56" alt="Chronicle"/></a>
+  <a href="https://dev.flare.network" title="Flare"><img src="https://github.com/flare-foundation.png" width="56" height="56" alt="Flare"/></a>
+  <a href="https://docs.nillion.com" title="Nillion"><img src="https://github.com/NillionNetwork.png" width="56" height="56" alt="Nillion"/></a>
 </p>
 
 Source-confirmed public docs sites:
 
-- [1claw Docs](https://docs.1claw.xyz)
-- [Agent Layer](https://agent-layer.dev)
-- [Arbitrum](https://docs.arbitrum.io)
+- [React Native](https://reactnative.dev)
+- [Puppeteer](https://pptr.dev)
+- [pnpm](https://pnpm.io)
+- [PlayCanvas](https://developer.playcanvas.com)
+- [Sui](https://docs.sui.io)
 - [Besu](https://besu.hyperledger.org)
-- [Cardano](https://docs.cardano.org)
-- [Chronicle](https://docs.chroniclelabs.org)
 - [Ethereum execution-apis](https://ethereum.github.io/execution-apis/)
+- [Arbitrum](https://docs.arbitrum.io)
+- [Cardano](https://docs.cardano.org)
+- [Seal](https://seal-docs.wal.app)
+- [Walrus](https://docs.wal.app)
+- [SuiNS](https://docs.suins.io)
+- [Kaia](https://docs.kaia.io)
+- [Chronicle](https://docs.chroniclelabs.org)
 - [FitFileViewer](https://nick2bad4u.github.io/FitFileViewer/)
+- [Uptime Watcher](https://nick2bad4u.github.io/Uptime-Watcher/)
 - [Flare](https://dev.flare.network)
 - [Hashi](https://mystenlabs.github.io/hashi/design/)
-- [Kaia](https://docs.kaia.io)
 - [Nillion](https://docs.nillion.com)
-- [Ovineko](https://ovineko.com)
-- [PlayCanvas](https://developer.playcanvas.com)
-- [pnpm](https://pnpm.io)
-- [Puppeteer](https://pptr.dev)
-- [React Native](https://reactnative.dev)
-- [Seal](https://seal-docs.wal.app)
-- [Sui](https://docs.sui.io)
-- [SuiNS](https://docs.suins.io)
-- [ThunderID](https://thunderid.dev)
-- [Uptime Watcher](https://nick2bad4u.github.io/Uptime-Watcher/)
-- [Walrus](https://docs.wal.app)
+- [1claw Docs](https://docs.1claw.xyz)
+- [Agent Layer](https://agent-layer.dev)
 - [Ai DIY](https://docs.yiw.me)
+- [Ovineko](https://ovineko.com)
+- [ThunderID](https://thunderid.dev)
 
 Using this plugin? Open a PR to add your project.
 
