@@ -8,6 +8,7 @@ if (ExecutionEnvironment.canUseDOM) {
   let root = null;
   let lastUrl = location.href;
   let recheckInterval = null;
+  let migrationInterval = null;
   let injectionAttempts = 0;
 
   const getPluginOptions = () => {
@@ -128,6 +129,7 @@ if (ExecutionEnvironment.canUseDOM) {
       customStyles: renderOptions.customStyles,
       enabledActions: renderOptions.enabledActions,
       generateMarkdownRoutes: renderOptions.generateMarkdownRoutes,
+      markdownUrl: renderOptions.markdownUrl,
       mcpServer: renderOptions.mcpServer,
       labels: renderOptions.labels
     }));
@@ -192,6 +194,7 @@ if (ExecutionEnvironment.canUseDOM) {
       customStyles: renderOptions.customStyles,
       enabledActions: renderOptions.enabledActions,
       generateMarkdownRoutes: renderOptions.generateMarkdownRoutes,
+      markdownUrl: renderOptions.markdownUrl,
       mcpServer: renderOptions.mcpServer,
       labels: renderOptions.labels
     }));
@@ -270,6 +273,7 @@ if (ExecutionEnvironment.canUseDOM) {
       customStyles: renderOptions.customStyles,
       enabledActions: renderOptions.enabledActions,
       generateMarkdownRoutes: renderOptions.generateMarkdownRoutes,
+      markdownUrl: renderOptions.markdownUrl,
       mcpServer: renderOptions.mcpServer,
       labels: renderOptions.labels
     }));
@@ -317,11 +321,17 @@ if (ExecutionEnvironment.canUseDOM) {
     // Only cleanup and re-inject if button is not properly attached
     if (!buttonProperlyAttached) {
       cleanup();
-      
+
       // Clear any existing recheck interval
       if (recheckInterval) {
         clearInterval(recheckInterval);
         recheckInterval = null;
+      }
+
+      // Drop any pending fallback->sidebar migration from the previous route.
+      if (migrationInterval) {
+        clearInterval(migrationInterval);
+        migrationInterval = null;
       }
       
       // Use fast injection for navigation since DOM is already stable
@@ -333,6 +343,47 @@ if (ExecutionEnvironment.canUseDOM) {
         fastInjectCopyPageButton();
       }
     }
+  };
+
+  // Migrate an `auto`-placement button from the in-article fallback up into the
+  // ToC sidebar once the sidebar mounts and becomes visible. This is what makes
+  // auto placement deterministic across loads: regardless of whether the
+  // sidebar was ready at first paint, the button ends up in the same spot.
+  const watchForSidebarMigration = () => {
+    if (migrationInterval) {
+      clearInterval(migrationInterval);
+    }
+
+    let ticks = 0;
+    const maxTicks = 30; // ~15s, matching the other injection safety nets
+
+    migrationInterval = setInterval(() => {
+      ticks++;
+
+      const container = document.getElementById("copy-page-button-container");
+      const stillInFallback = container && container.dataset.fallback === "true";
+
+      // Nothing left to migrate (button moved, removed, or route changed).
+      if (!stillInFallback) {
+        clearInterval(migrationInterval);
+        migrationInterval = null;
+        return;
+      }
+
+      // Once a visible desktop ToC exists, re-run injection — it now resolves to
+      // the sidebar and cleanly moves the button out of the article.
+      if (!shouldUseArticlePlacement(findSidebar())) {
+        reliableInjectCopyPageButton();
+        clearInterval(migrationInterval);
+        migrationInterval = null;
+        return;
+      }
+
+      if (ticks >= maxTicks) {
+        clearInterval(migrationInterval);
+        migrationInterval = null;
+      }
+    }, 500);
   };
 
   let mountObserver = null;
@@ -364,6 +415,19 @@ if (ExecutionEnvironment.canUseDOM) {
 
     // Strategy 1: synchronous attempt if DOM is already there.
     if (tryInject()) {
+      // Under `auto` placement, a first attempt can land in the in-article
+      // fallback simply because the ToC sidebar hasn't mounted (or isn't yet
+      // measured as visible) this early in hydration. If we stopped here, the
+      // button would be stuck inline for the rest of the page's life — and
+      // since the timing varies per load, that's exactly the "inconsistent
+      // placement" maintainers see. Hand off to a dedicated watcher that
+      // migrates the button up into the sidebar the moment it appears.
+      const placedContainer = document.getElementById("copy-page-button-container");
+      const landedInFallback =
+        placedContainer && placedContainer.dataset.fallback === "true";
+      if (landedInFallback && getPlacement() === "auto") {
+        watchForSidebarMigration();
+      }
       return;
     }
 

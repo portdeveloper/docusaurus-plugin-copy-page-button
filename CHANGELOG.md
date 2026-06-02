@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Added
+
+- New `markdownUrl` option to control which URL the "Open in ChatGPT/Claude/…" actions reference, independent of `generateMarkdownRoutes`. Sites that already publish per-page markdown (e.g. an llms.txt setup) can set `markdownUrl: true` to point the AI links at `/path.md` without this plugin generating any files. Accepts `true` / `false`, or a `(pageUrl) => string` function when rendering the React component directly.
+- Interaction tracking hooks. A `copy-page-button:action` event now fires on `document` for every dropdown action (`detail: { action, url }`), and the rendered DOM exposes `data-copy-page-button-container`, `data-copy-page-button-trigger`, and `data-copy-page-action="<id>"` attributes for delegated analytics listeners.
+
+### Fixed
+
+- `placement: "auto"` is now deterministic across loads. Previously, if the ToC sidebar hadn't mounted by the first injection attempt, the button could stay stuck in the in-article fallback for the rest of the page's life — and since that timing varied per load, placement looked inconsistent. The button now migrates from the article fallback up into the sidebar as soon as it appears.
+
 ## 0.7.0 — 2026-05-26
 
 ### Added

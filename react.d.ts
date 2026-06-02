@@ -56,6 +56,14 @@ export type CopyPageButtonProps = {
   };
   enabledActions?: ActionId[];
   generateMarkdownRoutes?: boolean;
+  /**
+   * Which URL the "Open in ChatGPT/Claude/…" actions reference.
+   * - `true` — derive a `/path.md` URL from the current page.
+   * - `false` — always use the HTML page URL.
+   * - function — custom mapping, e.g. to match an existing llms.txt layout.
+   * - omitted — follows `generateMarkdownRoutes`.
+   */
+  markdownUrl?: boolean | ((pageUrl: string) => string);
   mcpServer?: McpServerOption | null;
   labels?: CopyPageButtonLabels;
 };

@@ -60,6 +60,7 @@ export default function CopyPageButton({
   customStyles = {},
   enabledActions,
   generateMarkdownRoutes = false,
+  markdownUrl,
   mcpServer = null,
   labels = {}
 }) {
@@ -196,11 +197,55 @@ export default function CopyPageButton({
     await writeTextToClipboard(text);
   };
 
+  // Resolve which URL the AI prompt should reference. Sites that already serve
+  // per-page markdown (e.g. an llms.txt setup) can point the AI links at those
+  // URLs WITHOUT asking the plugin to generate routes — set `markdownUrl`.
+  //   markdownUrl: true       -> built-in `/path` -> `/path.md` transform
+  //   markdownUrl: false      -> always use the HTML page URL
+  //   markdownUrl: (url)=>str -> custom mapping (direct-component usage only;
+  //                              functions can't cross the auto-injection boundary)
+  //   markdownUrl: undefined  -> legacy: follow `generateMarkdownRoutes`
+  const resolveContextUrl = (pageUrl) => {
+    if (typeof markdownUrl === "function") {
+      try {
+        return markdownUrl(pageUrl) || pageUrl;
+      } catch (err) {
+        return pageUrl;
+      }
+    }
+    if (markdownUrl === true) {
+      return getMarkdownRouteUrl(pageUrl);
+    }
+    if (markdownUrl === false) {
+      return pageUrl;
+    }
+    return generateMarkdownRoutes ? getMarkdownRouteUrl(pageUrl) : pageUrl;
+  };
+
+  // Notify host-site analytics whenever a dropdown action runs, so maintainers
+  // can measure how the button is used. Pairs with the `data-copy-page-action`
+  // attributes for sites that prefer delegated DOM listeners.
+  const emitInteraction = (actionId) => {
+    if (typeof document === "undefined") {
+      return;
+    }
+    try {
+      document.dispatchEvent(
+        new CustomEvent("copy-page-button:action", {
+          detail: {
+            action: actionId,
+            url: typeof window !== "undefined" ? window.location.href : "",
+          },
+        })
+      );
+    } catch (err) {
+      // Silently fail — analytics must never break the page.
+    }
+  };
+
   const openInAI = (baseUrl, queryParam = 'q', extraParams = {}) => {
     try {
-      const currentUrl = generateMarkdownRoutes
-        ? getMarkdownRouteUrl(window.location.href)
-        : window.location.href;
+      const currentUrl = resolveContextUrl(window.location.href);
       const prompt = `Please read and explain this documentation page: ${currentUrl}
 
 Please provide a clear summary and help me understand the key concepts covered in this documentation.`;
@@ -516,9 +561,10 @@ Please provide a clear summary and help me understand the key concepts covered i
 
   return (
     <>
-      <div 
+      <div
         className={containerProps.className}
         style={containerProps.style}
+        data-copy-page-button-container=""
       >
         <button
           className={buttonProps.className}
@@ -526,6 +572,7 @@ Please provide a clear summary and help me understand the key concepts covered i
           onClick={handleButtonClick}
           aria-expanded={isOpen}
           aria-haspopup="true"
+          data-copy-page-button-trigger=""
           ref={buttonRef}
         >
           <svg
@@ -573,7 +620,9 @@ Please provide a clear summary and help me understand the key concepts covered i
               key={item.id}
               className={dropdownItemProps.className}
               style={dropdownItemProps.style}
+              data-copy-page-action={item.id}
               onClick={() => {
+                emitInteraction(item.id);
                 item.action();
                 closeDropdown();
               }}

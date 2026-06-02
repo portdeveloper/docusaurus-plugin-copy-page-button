@@ -100,6 +100,7 @@ module.exports = function copyPageButtonPlugin(context, options = {}) {
     customStyles = {},
     enabledActions,
     generateMarkdownRoutes = false,
+    markdownUrl,
     injectButton = true,
     placement = 'auto',
     mcpServer = null,
@@ -123,6 +124,10 @@ module.exports = function copyPageButtonPlugin(context, options = {}) {
                 customStyles,
                 enabledActions,
                 generateMarkdownRoutes,
+                // Functions can't survive JSON serialization into the injected
+                // script, so the auto-injection path supports the boolean form.
+                // Use the React component directly for a function `markdownUrl`.
+                markdownUrl: typeof markdownUrl === "function" ? undefined : markdownUrl,
                 placement,
                 mcpServer,
                 ...otherOptions
