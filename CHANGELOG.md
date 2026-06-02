@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+## 0.8.0 — 2026-06-02
+
 ### Added
 
 - New `markdownUrl` option to control which URL the "Open in ChatGPT/Claude/…" actions reference, independent of `generateMarkdownRoutes`. Sites that already publish per-page markdown (e.g. an llms.txt setup) can set `markdownUrl: true` to point the AI links at `/path.md` without this plugin generating any files. Accepts `true` / `false`, or a `(pageUrl) => string` function when rendering the React component directly.
