@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+## 0.8.1 — 2026-06-05
+
+### Fixed
+
+- Corrected the malformed "Open in Perplexity" icon. The previous SVG path didn't match the Perplexity mark; it now uses the official logo. ([#5](https://github.com/portdeveloper/docusaurus-plugin-copy-page-button/issues/5))
+
 ## 0.8.0 — 2026-06-02
 
 ### Added
