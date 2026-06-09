@@ -60,10 +60,11 @@ Source-confirmed public docs sites:
 - [Ai DIY](https://docs.yiw.me)
 - [Ovineko](https://ovineko.com)
 - [ThunderID](https://thunderid.dev)
+- [Redux Toolkit](https://redux-toolkit.js.org)
 
 Using this plugin? Open a PR to add your project.
 
-In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Ionic docs](https://github.com/ionic-team/ionic-docs/pull/4499), [Redux Toolkit docs](https://github.com/reduxjs/redux-toolkit/pull/5299), and [Uniswap docs](https://github.com/Uniswap/docs/pull/1132).
+In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Ionic docs](https://github.com/ionic-team/ionic-docs/pull/4499), and [Uniswap docs](https://github.com/Uniswap/docs/pull/1132).
 
 ## Why Use This Plugin?
 
