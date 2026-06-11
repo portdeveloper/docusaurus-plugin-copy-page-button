@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { translate } from "@docusaurus/Translate";
 import styles from "./styles.module.css";
 const {
@@ -10,6 +10,10 @@ const DEFAULT_ACTIONS = ['copy', 'view', 'chatgpt', 'claude', 'perplexity', 'gem
 const DEFAULT_MCP_ACTIONS = ['mcp-copy', 'mcp-cursor', 'mcp-vscode'];
 const POSITIONING_PROPS = ['position', 'top', 'right', 'bottom', 'left', 'zIndex', 'transform'];
 const DROPDOWN_WIDTH = 300;
+// useLayoutEffect warns during SSR; fall back to useEffect on the server.
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 const DROPDOWN_OFFSET = 8;
 const VIEWPORT_PADDING = 8;
 
@@ -43,17 +47,27 @@ const separatePositioningStyles = (styleObject = {}) => {
   return { positioning, nonPositioning };
 };
 
-const getDropdownPosition = (buttonElement) => {
+const getDropdownPosition = (buttonElement, dropdownHeight = 0) => {
   const rect = buttonElement.getBoundingClientRect();
   const maxLeft = window.innerWidth - DROPDOWN_WIDTH - VIEWPORT_PADDING;
+  const left = Math.max(
+    VIEWPORT_PADDING,
+    Math.min(rect.right - DROPDOWN_WIDTH, maxLeft)
+  );
 
-  return {
-    top: rect.bottom + DROPDOWN_OFFSET,
-    left: Math.max(
-      VIEWPORT_PADDING,
-      Math.min(rect.right - DROPDOWN_WIDTH, maxLeft)
-    ),
-  };
+  // Open downward by default, but flip upward when there isn't enough room
+  // below the button and there's more room above — e.g. when the button sits
+  // near the bottom of the viewport (such as in a page footer).
+  const spaceBelow = window.innerHeight - rect.bottom - VIEWPORT_PADDING;
+  const spaceAbove = rect.top - VIEWPORT_PADDING;
+  const openUp =
+    dropdownHeight > 0 && spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+
+  const top = openUp
+    ? Math.max(VIEWPORT_PADDING, rect.top - DROPDOWN_OFFSET - dropdownHeight)
+    : rect.bottom + DROPDOWN_OFFSET;
+
+  return { top, left };
 };
 
 export default function CopyPageButton({
@@ -92,7 +106,10 @@ export default function CopyPageButton({
       return false;
     }
 
-    setDropdownPosition(getDropdownPosition(buttonRef.current));
+    const dropdownHeight = dropdownRef.current
+      ? dropdownRef.current.offsetHeight
+      : 0;
+    setDropdownPosition(getDropdownPosition(buttonRef.current, dropdownHeight));
     return true;
   };
 
@@ -132,11 +149,13 @@ export default function CopyPageButton({
     };
   }, [isOpen]);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!isOpen || typeof window === 'undefined') {
       return undefined;
     }
 
+    // Reposition once the dropdown is in the DOM so its measured height can
+    // drive the open-up/open-down decision (avoids a flash at the wrong spot).
     updateDropdownPosition();
 
     window.addEventListener('resize', updateDropdownPosition);

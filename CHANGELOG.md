@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+## 0.8.2 — 2026-06-11
+
+### Fixed
+
+- The actions dropdown now flips upward when there isn't enough room below the button (e.g. when the button is placed near the bottom of the page content, such as in a footer). It measures available viewport space and opens up or down accordingly, so the menu no longer renders off-screen.
+
 ## 0.8.1 — 2026-06-05
 
 ### Fixed
