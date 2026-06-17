@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+## 0.8.3 — 2026-06-17
+
+### Fixed
+
+- `generateMarkdownRoutes` now works on sites configured with `trailingSlash: false`. Docusaurus emits flat `<route>.html` files under that setting (instead of the default `<route>/index.html`), which the build-time markdown generator didn't look for — so it silently produced zero `.md` files. It now resolves both layouts.
+
 ## 0.8.2 — 2026-06-11
 
 ### Fixed

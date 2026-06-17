@@ -33,7 +33,18 @@ const getHtmlOutputPath = (outDir, routePath, baseUrl) => {
   if (path.extname(trimmed)) {
     return path.join(outDir, trimmed);
   }
-  return path.join(outDir, trimmed, "index.html");
+  // Docusaurus emits `<route>/index.html` by default, but `<route>.html`
+  // when the site sets `trailingSlash: false`. Prefer whichever exists so
+  // markdown generation works under both layouts.
+  const nestedPath = path.join(outDir, trimmed, "index.html");
+  if (fs.existsSync(nestedPath)) {
+    return nestedPath;
+  }
+  const flatPath = path.join(outDir, `${trimmed}.html`);
+  if (fs.existsSync(flatPath)) {
+    return flatPath;
+  }
+  return nestedPath;
 };
 
 const getMarkdownOutputPath = (outDir, routePath, baseUrl) => {
