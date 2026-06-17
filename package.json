@@ -1,6 +1,6 @@
 {
   "name": "docusaurus-plugin-copy-page-button",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Docusaurus plugin that adds a copy page button to extract documentation content as markdown for AI tools like ChatGPT, Claude, Perplexity, and Gemini",
   "main": "src/index.js",
   "files": [
@@ -48,6 +48,7 @@
   },
   "types": "index.d.ts",
   "scripts": {
+    "test": "node --test",
     "pack:check": "npm pack --dry-run"
   },
   "engines": {
