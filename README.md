@@ -31,6 +31,7 @@ Shipping in production on documentation sites across the ecosystem:
   <a href="https://docs.chroniclelabs.org" title="Chronicle"><img src="https://github.com/chronicleprotocol.png" width="56" height="56" alt="Chronicle"/></a>
   <a href="https://dev.flare.network" title="Flare"><img src="https://github.com/flare-foundation.png" width="56" height="56" alt="Flare"/></a>
   <a href="https://docs.nillion.com" title="Nillion"><img src="https://github.com/NillionNetwork.png" width="56" height="56" alt="Nillion"/></a>
+  <a href="https://stryker-mutator.io" title="Stryker"><img src="https://github.com/stryker-mutator.png" width="56" height="56" alt="Stryker"/></a>
 </p>
 
 Source-confirmed public docs sites:
@@ -61,10 +62,12 @@ Source-confirmed public docs sites:
 - [Ovineko](https://ovineko.com)
 - [ThunderID](https://thunderid.dev)
 - [Redux Toolkit](https://redux-toolkit.js.org)
+- [Stryker](https://stryker-mutator.io)
+- [Ionic](https://ionicframework.com/docs)
 
 Using this plugin? Open a PR to add your project.
 
-In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Ionic docs](https://github.com/ionic-team/ionic-docs/pull/4499), and [Uniswap docs](https://github.com/Uniswap/docs/pull/1132).
+In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Uniswap docs](https://github.com/Uniswap/docs/pull/1132), [BandChain docs](https://github.com/bandprotocol/bandchain-docs/pull/93), and [Capacitor docs](https://github.com/ionic-team/capacitor-docs/pull/556).
 
 ## Why Use This Plugin?
 
