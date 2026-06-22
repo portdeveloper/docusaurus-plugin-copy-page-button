@@ -67,7 +67,7 @@ Source-confirmed public docs sites:
 
 Using this plugin? Open a PR to add your project.
 
-In review for [Ceramic docs](https://github.com/ceramicnetwork/docs-docusaurus/pull/114), [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Uniswap docs](https://github.com/Uniswap/docs/pull/1132), [BandChain docs](https://github.com/bandprotocol/bandchain-docs/pull/93), and [Capacitor docs](https://github.com/ionic-team/capacitor-docs/pull/556).
+In review for [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Uniswap docs](https://github.com/Uniswap/docs/pull/1132), [BandChain docs](https://github.com/bandprotocol/bandchain-docs/pull/93), and [Capacitor docs](https://github.com/ionic-team/capacitor-docs/pull/556).
 
 ## Why Use This Plugin?
 
