@@ -67,7 +67,7 @@ Source-confirmed public docs sites:
 
 Using this plugin? Open a PR to add your project.
 
-In review for [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Uniswap docs](https://github.com/Uniswap/docs/pull/1132), [BandChain docs](https://github.com/bandprotocol/bandchain-docs/pull/93), and [Capacitor docs](https://github.com/ionic-team/capacitor-docs/pull/556).
+In review for [Cypress documentation](https://github.com/cypress-io/cypress-documentation/pull/6462), [Uniswap docs](https://github.com/Uniswap/docs/pull/1132), [Osmosis docs](https://github.com/osmosis-labs/docs/pull/342), [BandChain docs](https://github.com/bandprotocol/bandchain-docs/pull/93), [Capacitor docs](https://github.com/ionic-team/capacitor-docs/pull/556), [Lerna](https://github.com/lerna/lerna/pull/4368), and [Sequelize](https://github.com/sequelize/website/pull/840).
 
 ## Why Use This Plugin?
 
