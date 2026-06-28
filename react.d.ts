@@ -3,6 +3,7 @@ import type {ComponentType, CSSProperties} from 'react';
 type ActionId =
   | 'copy'
   | 'view'
+  | 'copy-link'
   | 'chatgpt'
   | 'claude'
   | 'perplexity'
@@ -38,6 +39,7 @@ export type CopyPageButtonLabels = {
   button?: {label?: string};
   copy?: LabelGroup;
   view?: LabelGroup;
+  copyLink?: LabelGroup;
   chatgpt?: LabelGroup;
   claude?: LabelGroup;
   perplexity?: LabelGroup;
