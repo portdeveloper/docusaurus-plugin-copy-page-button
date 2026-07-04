@@ -566,6 +566,8 @@ Docusaurus plugin, copy page button, extract documentation, markdown conversion,
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, testing, and PR guidelines. All participants are expected to follow our [Code of Conduct](./CODE_OF_CONDUCT.md).
+
 ## Support
 
 - 🐛 [Report Issues](https://github.com/portdeveloper/docusaurus-plugin-copy-page-button/issues)
