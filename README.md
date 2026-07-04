@@ -217,6 +217,7 @@ module.exports = {
 **Available actions:**
 - `'copy'` - Copy page as Markdown
 - `'view'` - View as Markdown in new tab
+- `'copy-link'` - Copy a link to the page's Markdown (`.md`) URL
 - `'chatgpt'` - Open in ChatGPT
 - `'claude'` - Open in Claude
 - `'perplexity'` - Open in Perplexity
@@ -225,7 +226,7 @@ module.exports = {
 - `'mcp-cursor'` - Install MCP server in Cursor (shown when `mcpServer` is configured)
 - `'mcp-vscode'` - Install MCP server in VS Code (shown when `mcpServer` is configured)
 
-**Default:** Standard actions are enabled: `['copy', 'view', 'chatgpt', 'claude', 'perplexity', 'gemini']`. MCP actions are enabled automatically only when `mcpServer` is configured.
+**Default:** Standard actions are enabled: `['copy', 'view', 'copy-link', 'chatgpt', 'claude', 'perplexity', 'gemini']`. MCP actions are enabled automatically only when `mcpServer` is configured.
 
 **Example configurations:**
 
@@ -237,7 +238,7 @@ enabledActions: ['copy']
 enabledActions: ['copy', 'view']
 
 // All standard AI actions (default)
-enabledActions: ['copy', 'view', 'chatgpt', 'claude', 'perplexity', 'gemini']
+enabledActions: ['copy', 'view', 'copy-link', 'chatgpt', 'claude', 'perplexity', 'gemini']
 ```
 
 ### MCP server actions
@@ -440,6 +441,7 @@ Available translation IDs:
 | `copyPageButton.button.label` | `Copy page` (visible button text) |
 | `copyPageButton.copy.title` / `.description` | `Copy page` / `Copy the page as Markdown for LLMs` |
 | `copyPageButton.view.title` / `.description` | `View as Markdown` / `View this page as plain text` |
+| `copyPageButton.copyLink.title` / `.description` | `Copy link to Markdown` / `Copy this page's .md URL` |
 | `copyPageButton.chatgpt.title` / `.description` | `Open in ChatGPT` / `Ask questions about this page` |
 | `copyPageButton.claude.title` / `.description` | `Open in Claude` / `Ask questions about this page` |
 | `copyPageButton.perplexity.title` / `.description` | `Open in Perplexity` / `Ask questions about this page` |

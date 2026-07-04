@@ -6,7 +6,7 @@ const {
   getMarkdownRouteUrl,
 } = require("./htmlToMarkdown");
 
-const DEFAULT_ACTIONS = ['copy', 'view', 'chatgpt', 'claude', 'perplexity', 'gemini'];
+const DEFAULT_ACTIONS = ['copy', 'view', 'copy-link', 'chatgpt', 'claude', 'perplexity', 'gemini'];
 const DEFAULT_MCP_ACTIONS = ['mcp-copy', 'mcp-cursor', 'mcp-vscode'];
 const POSITIONING_PROPS = ['position', 'top', 'right', 'bottom', 'left', 'zIndex', 'transform'];
 const DROPDOWN_WIDTH = 300;
@@ -241,6 +241,16 @@ export default function CopyPageButton({
     return generateMarkdownRoutes ? getMarkdownRouteUrl(pageUrl) : pageUrl;
   };
 
+  // Copy a link to the current page's markdown to the clipboard. Resolves the
+  // same URL the "Open in ChatGPT/Claude/…" actions reference, so on sites that
+  // serve per-page markdown this copies the `.md` link rather than the HTML one.
+  const copyMarkdownLink = async () => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    await writeTextToClipboard(resolveContextUrl(window.location.href));
+  };
+
   // Notify host-site analytics whenever a dropdown action runs, so maintainers
   // can measure how the button is used. Pairs with the `data-copy-page-action`
   // attributes for sites that prefer delegated DOM listeners.
@@ -408,6 +418,25 @@ Please provide a clear summary and help me understand the key concepts covered i
         </svg>
       ),
       action: viewAsMarkdown,
+    },
+    {
+      id: "copy-link",
+      title: t("copyLink", "title", "Copy link to Markdown"),
+      description: t("copyLink", "description", "Copy this page's .md URL"),
+      icon: (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+      ),
+      action: copyMarkdownLink,
     },
     {
       id: "chatgpt",

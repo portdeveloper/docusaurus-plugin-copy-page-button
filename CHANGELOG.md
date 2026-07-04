@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Added
+
+- `copy-link` action — copies a link to the current page's Markdown (`.md`) URL to the clipboard. It resolves the same URL the "Open in …" AI actions use (honouring `markdownUrl` / `generateMarkdownRoutes`), so on sites that serve per-page markdown it copies the `.md` link instead of the HTML page URL. Enabled by default; configurable via `enabledActions` and `labels.copyLink`.
+
 ## 0.8.3 — 2026-06-17
 
 ### Fixed
