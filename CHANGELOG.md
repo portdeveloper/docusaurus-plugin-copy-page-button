@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+## 0.8.4 — 2026-07-04
+
+### Changed
+
+- README now leads with an animated demo of the button in action instead of a static screenshot. No code changes.
+
 ## 0.8.3 — 2026-06-17
 
 ### Fixed
