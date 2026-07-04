@@ -7,7 +7,7 @@
 
 **[Live Demo](https://portdeveloper.github.io/copy-page-button-showcase/)** · **[Read the story](https://portdeveloper.github.io/articles/how-a-button-i-built-for-one-docs-site-ended-up-on-twenty.html)**
 
-<img src="https://github.com/user-attachments/assets/8e7351ba-0cab-489c-bbcf-543603c3bcf1" alt="Docusaurus Copy Page Button Plugin Preview" width="418" height="448" />
+<img src="https://raw.githubusercontent.com/portdeveloper/docusaurus-plugin-copy-page-button/main/plugin.gif" alt="Docusaurus Copy Page Button Plugin demo" width="480" />
 
 **Extract Docusaurus documentation content as markdown for AI tools like ChatGPT, Claude, Perplexity, and Gemini**
 
