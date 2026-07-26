@@ -43,9 +43,10 @@ The `CopyPageButton.js` component includes comprehensive markdown conversion log
 ## Development Workflow
 
 Since this is a pure Docusaurus plugin with no build step:
-- No npm scripts for building, testing, or linting
-- Changes to source files are immediately usable
-- Test by linking the package locally and using in a Docusaurus project
+- No build step or linter; changes to source files are immediately usable
+- `npm test` runs the Node test-runner tests in `test/`; `npm run pack:check` verifies the published tarball contents
+- CI (`.github/workflows/ci.yml`) runs both on every push to `main` and every PR
+- For behavior that CI cannot cover, test by linking the package locally and using it in a Docusaurus project
 
 ## Documentation Outreach PRs
 
