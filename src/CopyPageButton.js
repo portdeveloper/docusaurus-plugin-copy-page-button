@@ -290,7 +290,7 @@ Please provide a clear summary and help me understand the key concepts covered i
     }
 
     try {
-      const blob = new Blob([contentToView], { type: "text/plain" });
+      const blob = new Blob([contentToView], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
     } catch (err) {
