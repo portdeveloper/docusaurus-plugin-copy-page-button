@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+## 0.8.5 — 2026-10-12
+
+### Fixed
+
+- "View as markdown" now opens the blob as `text/plain;charset=utf-8`, so pages with non-ASCII text (CJK, accented characters, emoji) no longer render as mojibake. Thanks @wang1212 (#10).
+
 ## 0.8.4 — 2026-07-04
 
 ### Changed
