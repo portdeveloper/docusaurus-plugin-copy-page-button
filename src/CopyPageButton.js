@@ -90,7 +90,6 @@ export default function CopyPageButton({
   };
 
   const [isOpen, setIsOpen] = useState(false);
-  const [pageContent, setPageContent] = useState("");
   const [dropdownPosition, setDropdownPosition] = useState(null);
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
@@ -167,15 +166,10 @@ export default function CopyPageButton({
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    const content = extractPageContent();
-    if (content) {
-      setPageContent(content);
-    }
-  }, []);
-
+  // Markdown is extracted on demand (when an action runs), never on mount:
+  // extracting eagerly costs a full-article clone + conversion on every page
+  // view, and reading it fresh also keeps it in sync after client-side
+  // navigation.
   const extractPageContent = () => {
     return extractPageMarkdownFromDocument(document, window.location.href);
   };
@@ -201,19 +195,13 @@ export default function CopyPageButton({
     }
   };
 
-  const copyToClipboard = async (text) => {
-    // If no content, try to extract it now
-    if (!text || text.trim() === '') {
-      const extractedContent = extractPageContent();
-      if (extractedContent) {
-        setPageContent(extractedContent);
-        text = extractedContent;
-      } else {
-        return;
-      }
+  const copyPageContent = async () => {
+    const content = extractPageContent();
+    if (!content) {
+      return;
     }
 
-    await writeTextToClipboard(text);
+    await writeTextToClipboard(content);
   };
 
   // Resolve which URL the AI prompt should reference. Sites that already serve
@@ -276,17 +264,9 @@ Please provide a clear summary and help me understand the key concepts covered i
   };
 
   const viewAsMarkdown = () => {
-    let contentToView = pageContent;
-
-    // If no content, try to extract it now
-    if (!contentToView || contentToView.trim() === '') {
-      const extractedContent = extractPageContent();
-      if (extractedContent) {
-        setPageContent(extractedContent);
-        contentToView = extractedContent;
-      } else {
-        return;
-      }
+    const contentToView = extractPageContent();
+    if (!contentToView) {
+      return;
     }
 
     try {
@@ -386,7 +366,7 @@ Please provide a clear summary and help me understand the key concepts covered i
           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
         </svg>
       ),
-      action: () => copyToClipboard(pageContent),
+      action: () => copyPageContent(),
     },
     {
       id: "view",

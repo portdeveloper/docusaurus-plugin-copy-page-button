@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Fixed
+
+- The button no longer converts the page to markdown when it mounts. Markdown is now extracted only when an action runs, which removes a full-article clone and conversion from every page view and keeps the content current after client-side navigation. The extraction clone is also built in a detached, inert document so cloned `<img>` elements can't start downloads that bypass `loading="lazy"` (#12).
+
 ## 0.8.5 — 2026-10-12
 
 ### Fixed

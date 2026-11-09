@@ -407,10 +407,29 @@ const cloneTree = (node, parent = null) => {
   return clone;
 };
 
+// Clone a live DOM node into a detached, inert document. A plain
+// `cloneNode(true)` stays owned by the live document, so every cloned <img>
+// starts downloading immediately and `loading="lazy"` is ignored (#12).
+// Documents from `createHTMLDocument` have no browsing context, so nothing
+// imported into them fetches resources.
+const cloneDomNode = (node) => {
+  const ownerDocument = node.ownerDocument;
+  const implementation = ownerDocument && ownerDocument.implementation;
+  if (implementation && typeof implementation.createHTMLDocument === "function") {
+    try {
+      const inertDocument = implementation.createHTMLDocument("");
+      return inertDocument.importNode(node, true);
+    } catch (error) {
+      // Fall through to a plain clone.
+    }
+  }
+  return node.cloneNode(true);
+};
+
 const cloneNode = (node, context = {}) => {
   if (!node) return null;
   if (typeof node.cloneNode === "function") {
-    return node.cloneNode(true);
+    return cloneDomNode(node);
   }
   if (context.$) {
     return context.$(node).clone().get(0) || null;
