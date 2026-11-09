@@ -3,10 +3,22 @@ import { createRoot } from "react-dom/client";
 import CopyPageButton from "./CopyPageButton";
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 
+// Docusaurus calls this client-module lifecycle from a layout effect after
+// every route commit. The first call (previousLocation === null) happens once
+// hydration has committed, so injecting from here never mutates server-
+// rendered DOM React is still hydrating (#11). Assigned below in the browser.
+let routeDidUpdate = null;
+
+export function onRouteDidUpdate(args) {
+  if (routeDidUpdate) {
+    routeDidUpdate(args);
+  }
+}
+
 // Only run in browser environment
 if (ExecutionEnvironment.canUseDOM) {
   let root = null;
-  let lastUrl = location.href;
+  let initialized = false;
   let recheckInterval = null;
   let migrationInterval = null;
   let injectionAttempts = 0;
@@ -491,18 +503,41 @@ if (ExecutionEnvironment.canUseDOM) {
     }, 500);
   };
 
-  // Initialize when DOM is ready (only for page refresh/initial load)
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(initializeButton, 100);
-    });
-  } else {
-    setTimeout(initializeButton, 100);
+  const initializeOnce = () => {
+    if (initialized) {
+      return;
+    }
+    initialized = true;
+    initializeButton();
+  };
+
+  routeDidUpdate = ({ location: nextLocation, previousLocation }) => {
+    if (!initialized) {
+      initializeOnce();
+      return;
+    }
+    // Hash/query-only changes keep the same page and the same button.
+    if (
+      previousLocation &&
+      nextLocation &&
+      nextLocation.pathname === previousLocation.pathname
+    ) {
+      return;
+    }
+    handleRouteChange();
+  };
+
+  // Loaded after hydration already finished (e.g. imported lazily from another
+  // client module rather than registered by the plugin): there is no first
+  // onRouteDidUpdate call left to wait for, so initialize now. Docusaurus sets
+  // <html data-has-hydrated="true"> once hydration completes.
+  if (document.documentElement.getAttribute("data-has-hydrated") === "true") {
+    initializeOnce();
   }
 
   // Force re-injection on page visibility change (helps with tab switching and refreshes)
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
+    if (initialized && !document.hidden) {
       setTimeout(() => {
         const container = document.getElementById("copy-page-button-container");
         const sidebar = findSidebar();
@@ -524,6 +559,9 @@ if (ExecutionEnvironment.canUseDOM) {
   // Handle responsive layout changes
   window.addEventListener("resize", () => {
     setTimeout(() => {
+      if (!initialized) {
+        return; // Never touch the DOM before hydration has committed.
+      }
       const container = document.getElementById("copy-page-button-container");
       const sidebar = findSidebar();
       const articleContent = findArticleContent();
@@ -546,45 +584,14 @@ if (ExecutionEnvironment.canUseDOM) {
     }, 300);
   });
 
-  // Handle browser navigation
-  window.addEventListener("popstate", handleRouteChange);
-
-  // Handle Docusaurus route changes
-  if (typeof window !== "undefined" && window.docusaurus) {
-    document.addEventListener("docusaurus-route-update", handleRouteChange);
-  }
-
-  // Targeted URL change detection for SPA routing
-  const checkUrlChange = () => {
-    if (location.href !== lastUrl) {
-      const currentPathname = location.pathname;
-      const lastPathname = new URL(lastUrl).pathname;
-      
-      // Only trigger route change for actual page changes, not hash/query changes
-      if (currentPathname !== lastPathname) {
-        lastUrl = location.href;
-        handleRouteChange(); // Use fast route change handler
-      } else {
-        // Just update the URL without triggering re-injection
-        lastUrl = location.href;
-      }
+  // Deprecated: Docusaurus never dispatches this event. Kept for 0.8.x so
+  // sites that dispatch it themselves (a workaround for #11) keep working;
+  // slated for removal in 0.9.0.
+  document.addEventListener("docusaurus-route-update", () => {
+    if (!initialized) {
+      initializeOnce();
+      return;
     }
-  };
-
-  // Check for URL changes - keep this for SPA navigation
-  setInterval(checkUrlChange, 100);
-
-  // Also intercept pushState/replaceState for immediate detection
-  const originalPushState = history.pushState;
-  const originalReplaceState = history.replaceState;
-
-  history.pushState = function (...args) {
-    originalPushState.apply(this, args);
-    setTimeout(checkUrlChange, 0);
-  };
-
-  history.replaceState = function (...args) {
-    originalReplaceState.apply(this, args);
-    setTimeout(checkUrlChange, 0);
-  };
+    handleRouteChange();
+  });
 }
