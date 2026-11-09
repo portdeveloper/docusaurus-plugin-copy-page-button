@@ -6,9 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+## 0.8.6 — 2026-11-10
+
 ### Fixed
 
-- The button no longer converts the page to markdown when it mounts. Markdown is now extracted only when an action runs, which removes a full-article clone and conversion from every page view and keeps the content current after client-side navigation. The extraction clone is also built in a detached, inert document so cloned `<img>` elements can't start downloads that bypass `loading="lazy"` (#12).
+- The auto-injected button now waits for hydration and survives client-side navigation (#11). Injection is driven by Docusaurus's `onRouteDidUpdate` client lifecycle instead of a `DOMContentLoaded` timer, a 100 ms URL poll, and `history.pushState`/`replaceState` patches. Previously the button could be inserted while React was still hydrating (React error #418, button lost for that page load) and usually vanished after navigating to another page. Thanks @willeastcott for the diagnosis.
+- The button no longer converts the page to markdown when it mounts. Markdown is now extracted only when an action runs, which removes a full-article clone and conversion from every page view and keeps the content current after client-side navigation. The extraction clone is also built in a detached, inert document so cloned `<img>` elements can't start downloads that bypass `loading="lazy"` (#12). Thanks @germanattanasio.
+
+### Deprecated
+
+- The `docusaurus-route-update` DOM event listener. Docusaurus never dispatches this event; it stays in 0.8.x only so sites that dispatch it themselves as a #11 workaround keep working, and will be removed in 0.9.0. If you added that workaround (importing `src/client.js` with `injectButton: false`), you can drop it and go back to the default `injectButton: true`.
 
 ## 0.8.5 — 2026-10-12
 
